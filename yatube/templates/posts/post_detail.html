@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% block title %}Пост {{ post|truncatechars:30 }}{% endblock %}
+{% block content %}
+<div class="row">
+  <aside class="col-12 col-md-3">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        Дата публикации: {{ post.pub_date|date:'d E Y' }}
+      </li>
+        {% if post.group %}
+        <li class="list-group-item">
+          Группа: {{ post.group }}
+          <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+        </li>
+        {% endif %}
+      <li class="list-group-item">
+        Автор: {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}
+      </li>
+      <li class="list-group-item">
+        Всего постов автора: {{ post.author.posts.count }}
+      </li>
+      <li class="list-group-item">
+        <a href="{% url 'posts:profile' post.author %}">все посты пользователя</a>
+      </li>
+    </ul>
+  </aside>
+  <article class="col-12 col-md-9">
+
+<div class="card bg-light" style="width: 100%">
+  {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+  <img class="card-img-top" src="{{ im.url }}">
+  {% endthumbnail %}
+  <div class="card-body">
+    <h4 class="card-title">Заголовок</h4>
+    <p class="card-text">
+      {{ post.text|linebreaksbr }}
+    </p>
+    {% if post.author == requser %}
+      <a class="btn btn-primary" href="{% url 'posts:edit' post.id %}">
+        Редактировать запись
+      </a>
+    {% endif %}
+  </div>
+</div>
+    {% load user_filters %}
+    {% if comments.count != 0 %}
+    {% with comments.count as total_comments %}
+    <hr>
+    <figure>
+      <blockquote class="blockquote">
+        <div class="shadow-sm p-2 bg-white rounded">
+          Комментариев {{ total_comments }}
+        </div>
+      </blockquote>
+    </figure>
+    {% endwith %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <div class="card my-4">
+        <h5 class="card-header">Добавить комментарий:</h5>
+          <div class="card-body">
+            <form method="post" action="{% url 'posts:add_comment' post.id %}">
+              {% csrf_token %}      
+              <div class="form-group mb-2">
+                {{ form.text|addclass:"form-control" }}
+              </div>
+              <button type="submit" class="btn btn-primary">Отправить комментарий</button>
+            </form>
+          </div>
+      </div>
+    {% endif %}
+
+    {% for comment in comments %}
+      <div class="media mb-4">
+        <div class="media-body">
+          <div class="alert alert-primary" role="alert">
+            {{ comment.created|date:'d E Y' }} <a href="{% url 'posts:profile' comment.author.username %}">{{ comment.author.get_full_name }}</a>:
+          </div>
+          <figure>
+            <blockquote class="blockquote">
+              <div class="shadow-sm p-3 bg-white">
+                {{ comment.text|linebreaks }}
+              </div>
+            </blockquote>
+          </figure>
+        </div>
+      </div>
+
+    {% empty %}
+    <hr>
+    <figure>
+      <blockquote class="blockquote">
+        <div class="shadow-sm p-2 bg-white rounded">
+          Комментариев нет, будь первым! 
+        </div>
+      </blockquote>
+    </figure>
+    {% endfor %}
+
+</article>
+</div>
+{% endblock %}

@@ -5,7 +5,12 @@ __pycache__/
 
 # C extensions
 *.so
-
+*.bat
+yatube/static/
+*.png
+*.ico
+*.css
+media/
 # Distribution / packaging
 .Python
 build/

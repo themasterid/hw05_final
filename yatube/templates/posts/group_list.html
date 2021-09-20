@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block title %}Записи сообщества: {{ group.title }}{% endblock %}
+{% block content %}
+{% include 'posts/includes/switcher.html' %}
+<div class="card bg-light" style="width: 100%">
+  <div class="card-body">
+    <h1 class="card-title">{{ group.title }}</h1>
+    <p class="card-text">{{ group.description|linebreaks }}</p>
+  </div>
+</div>
+
+{% for post in page_obj %}
+<ul class="list-group">
+ <li class="list-group-item list-group-item-light">
+   Автор: <a href="{% url 'posts:profile' post.author %}">
+     {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}
+   </a>
+ </li>
+ <li class="list-group-item list-group-item-light">
+   Дата публикации: <strong>{{ post.pub_date|date:'d E Y' }}</strong>
+ </li>
+</ul>
+
+<div class="card bg-light" style="width: 100%">
+  {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+  <img class="card-img-top" src="{{ im.url }}">
+  {% endthumbnail %}
+  <div class="card-body">
+    <h4 class="card-title">Заголовок</h4>
+    <p class="card-text">
+      {{ post.text|linebreaksbr }}
+    </p>
+    <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-primary">Подробная информация</a>  
+  </div>
+</div>
+
+{% if not forloop.last %}<hr>{% endif %}
+{% endfor %}
+<div class="d-flex justify-content-center">
+  <div>{% include 'posts/includes/paginator.html' %}</div>
+</div>
+{% endblock %}
