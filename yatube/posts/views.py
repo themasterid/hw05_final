@@ -13,8 +13,9 @@ User = get_user_model()
 
 # @cache_page(20, key_prefix="index_page")
 def index(request):
+    posts = Post.objects.all()
     paginator = Paginator(
-        Post.objects.all(),
+        posts,
         settings.NUMBER_POST
     )
     page_number = request.GET.get('page')
@@ -28,8 +29,9 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
+    groups = group.posts.all()
     paginator = Paginator(
-        group.posts.all(),
+        groups,
         settings.NUMBER_POST
     )
     page_obj = paginator.get_page(
@@ -42,8 +44,9 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
+    authors = author.posts.all()
     paginator = Paginator(
-        author.posts.all(),
+        authors,
         settings.NUMBER_POST
     )
     page_obj = paginator.get_page(
@@ -89,7 +92,9 @@ def add_comment(request, post_id):
 
 @login_required
 def post_create(request):
-    form = PostForm(request.POST or None)
+    form = PostForm(
+        request.POST or None,
+        files=request.FILES or None)
     if form.is_valid():
         create_post = form.save(commit=False)
         create_post.author = request.user

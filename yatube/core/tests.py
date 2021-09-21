@@ -8,7 +8,6 @@ class ViewTestClass(TestCase):
         self.client = Client()
 
     def test_error_page(self):
-        template = 'core/404.html'
         response = self.client.get('/nonexist-page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        self.assertTemplateUsed(response, template)
+        self.assertTemplateUsed(response, 'core/404.html')
