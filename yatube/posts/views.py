@@ -11,11 +11,10 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
-# @cache_page(20, key_prefix="index_page")
+@cache_page(20)
 def index(request):
-    posts = Post.objects.all()
     paginator = Paginator(
-        posts,
+        Post.objects.all(),
         settings.NUMBER_POST
     )
     page_number = request.GET.get('page')

@@ -5,6 +5,7 @@ import tempfile
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
@@ -54,6 +55,7 @@ class PostPagesTests(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def check_post_info(self, post):
         with self.subTest(post=post):
@@ -151,6 +153,7 @@ class PaginatorViewsTest(TestCase):
 
     def setUp(self):
         self.unauthorized_client = Client()
+        cache.clear()
 
     def test_paginator_on_pages(self):
         """Проверка пагинации на страницах."""
