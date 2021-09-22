@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..models import Group, Post
+from ..models import Follow, Group, Post
 
 User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -83,22 +83,6 @@ class PostPagesTests(TestCase):
                     response.context['form'].fields['image'],
                     forms.fields.ImageField)
 
-    '''
-    def test_form_comment_show_correct(self):
-        """Проверка коректности формы коментария."""
-        url_filds = {
-            reverse(
-                'posts:add_comment',
-                kwargs={'post_id': self.post.id, }),
-        }
-        for reverse_page in url_filds:
-            with self.subTest(reverse_page=reverse_page):
-                response = self.authorized_client.get(reverse_page)
-                self.assertIsInstance(
-                    response.context['form'].fields['text'],
-                    forms.fields.TextField)
-    '''
-
     def test_index_page_show_correct_context(self):
         """Шаблон index.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
@@ -130,6 +114,22 @@ class PostPagesTests(TestCase):
                 'posts:post_detail',
                 kwargs={'post_id': self.post.id}))
         self.check_post_info(response.context['post'])
+
+    def test_cache_index_page(self):
+        """Проверка работы кеша"""
+        post = Post.objects.create(
+            text='Пост под кеш',
+            author=self.user)
+        content_add = self.authorized_client.get(
+            reverse('posts:index')).content
+        post.delete()
+        content_delete = self.authorized_client.get(
+            reverse('posts:index')).content
+        self.assertEqual(content_add, content_delete)
+        cache.clear()
+        content_cache_clear = self.authorized_client.get(
+            reverse('posts:index')).content
+        self.assertNotEqual(content_add, content_cache_clear)
 
 
 class PaginatorViewsTest(TestCase):
@@ -174,3 +174,70 @@ class PaginatorViewsTest(TestCase):
                     pages + '?page=2').context.get('page_obj')),
                     posts_on_second_page
                 )
+
+
+class FollowViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.post_autor = User.objects.create(
+            username='post_autor',
+        )
+        cls.post_follower = User.objects.create(
+            username='post_follower',
+        )
+        cls.post = Post.objects.create(
+            text='Подпишись на меня',
+            author=cls.post_autor,
+        )
+
+    def setUp(self):
+        cache.clear()
+        self.author_client = Client()
+        self.author_client.force_login(self.post_follower)
+        self.follower_client = Client()
+        self.follower_client.force_login(self.post_autor)
+
+    def test_follow_on_pages(self):
+        """Проверка подписки на других пользователей."""
+        response = self.author_client.get(reverse('posts:follow_index'))
+        page_object = response.context.get('page_obj').object_list
+        self.assertEqual(len(page_object), 0)
+        self.author_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.post_autor.username}))
+        response = self.author_client.get(reverse('posts:follow_index'))
+        page_object = response.context.get('page_obj').object_list
+        self.assertEqual(len(page_object), 1)
+        self.assertEqual(page_object[0].text, self.post.text)
+        self.assertEqual(page_object[0].author, self.post_autor)
+        self.author_client.get(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.post_autor.username}))
+        response = self.author_client.get(reverse('posts:follow_index'))
+        page_object = response.context.get('page_obj').object_list
+        self.assertEqual(len(page_object), 0)
+
+    def test_follow_on_authors(self):
+        """Проверка записей у подписаных и неподписаных."""
+        self.author_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.post_autor.username}))
+        get_posts = self.author_client.get(reverse('posts:follow_index'))
+        posts = get_posts.context.get('page_obj').object_list
+        self.assertEqual(len(posts), 1)
+        Post.objects.create(
+            text='Проверка новая запись',
+            author=self.post_autor)
+        follow_new_record = self.author_client.get(
+            reverse('posts:follow_index'))
+        new_record = follow_new_record.context.get('page_obj').object_list
+        not_follow = self.follower_client.get(reverse('posts:follow_index'))
+        page_not_follow = not_follow.context.get('page_obj').object_list
+        self.assertEqual(len(new_record), 2)
+        self.assertEqual(new_record[1].text, self.post.text)
+        self.assertEqual(new_record[1].author, self.post_autor)
+        self.assertEqual(len(page_not_follow), 0)

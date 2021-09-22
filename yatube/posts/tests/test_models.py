@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post
+from ..models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -68,4 +68,33 @@ class GroupModelTest(TestCase):
         for value, expected in field_verboses.items():
             with self.subTest(value=value):
                 verbose_name = self.group._meta.get_field(value).verbose_name
+                self.assertEqual(verbose_name, expected)
+
+
+class FollowModelTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user1 = User.objects.create_user(username='auth1')
+        cls.user2 = User.objects.create_user(username='auth2')
+        cls.follow = Follow.objects.create(
+            user=cls.user1,
+            author=cls.user2,
+        )
+
+    def test_follow_str(self):
+        """Проверка __str__ у follow."""
+        self.assertEqual(
+            f'{self.follow.user} подписался на {self.follow.author}',
+            str(self.follow))
+
+    def test_follow_verbose_name(self):
+        """Проверка verbose_name у follow."""
+        field_verboses = {
+            'user': 'Пользователь',
+            'author': 'Автор',
+        }
+        for value, expected in field_verboses.items():
+            with self.subTest(value=value):
+                verbose_name = self.follow._meta.get_field(value).verbose_name
                 self.assertEqual(verbose_name, expected)

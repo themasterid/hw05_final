@@ -28,9 +28,8 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    groups = group.posts.all()
     paginator = Paginator(
-        groups,
+        group.posts.all(),
         settings.NUMBER_POST
     )
     page_obj = paginator.get_page(
@@ -43,9 +42,8 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    authors = author.posts.all()
     paginator = Paginator(
-        authors,
+        author.posts.all(),
         settings.NUMBER_POST
     )
     page_obj = paginator.get_page(
