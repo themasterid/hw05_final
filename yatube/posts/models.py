@@ -112,8 +112,8 @@ class Follow(models.Model):
         verbose_name='Автор')
 
     class Meta:
-        verbose_name_plural = 'Подписчика'
-        verbose_name = 'Подписчик'
+        verbose_name_plural = 'Подписки'
+        verbose_name = 'Подписка'
 
     def __str__(self):
         return f'{self.user} подписался на {self.author}'
