@@ -49,21 +49,21 @@ def profile(request, username):
     page_obj = paginator.get_page(
         request.GET.get('page')
     )
-    following = None
-    if request.user.is_authenticated:
-        following = author.following.filter(user=request.user).exists()
+    following_ = request.user.is_authenticated
+    if following_:
+        following_ = author.following.filter(user=request.user).exists()
     template = 'posts/profile.html'
     context = {
         'page_obj': page_obj,
         'author': author,
-        'following': following
+        'following': following_
     }
     return render(request, template, context)
 
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    comments = post.comments.filter(active=True)
+    comments = post.comments.all()
     form = CommentForm()
     template = 'posts/post_detail.html'
     context = {
@@ -140,9 +140,10 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    get_object_or_404(
+    user_follower = get_object_or_404(
         Follow,
         user=request.user,
         author__username=username
-    ).delete()
+    )
+    user_follower.delete()
     return redirect('posts:profile', username)

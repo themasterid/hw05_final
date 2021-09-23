@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..models import Group, Post
+from ..models import Follow, Group, Post
 
 User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -198,46 +198,42 @@ class FollowViewsTest(TestCase):
         self.follower_client = Client()
         self.follower_client.force_login(self.post_autor)
 
-    def test_follow_on_pages(self):
-        """Проверка подписки на других пользователей."""
-        response = self.author_client.get(reverse('posts:follow_index'))
-        page_object = response.context.get('page_obj').object_list
-        self.assertEqual(len(page_object), 0)
-        self.author_client.get(
+    def test_follow_on_user(self):
+        """Проверка подписки на пользователя."""
+        self.follower_client.post(
             reverse(
                 'posts:profile_follow',
-                kwargs={'username': self.post_autor.username}))
-        response = self.author_client.get(reverse('posts:follow_index'))
-        page_object = response.context.get('page_obj').object_list
-        self.assertEqual(len(page_object), 1)
-        self.assertEqual(page_object[0].text, self.post.text)
-        self.assertEqual(page_object[0].author, self.post_autor)
-        self.author_client.get(
+                kwargs={'username': self.post_follower}))
+        self.assertEqual(Follow.objects.count(), 1)
+
+    def test_unfollow_on_user(self):
+        """Проверка отписки от пользователя."""
+        Follow.objects.create(
+            user=self.post_autor,
+            author=self.post_follower)
+        self.follower_client.post(
             reverse(
                 'posts:profile_unfollow',
-                kwargs={'username': self.post_autor.username}))
-        response = self.author_client.get(reverse('posts:follow_index'))
-        page_object = response.context.get('page_obj').object_list
-        self.assertEqual(len(page_object), 0)
+                kwargs={'username': self.post_follower}))
+        self.assertEqual(Follow.objects.count(), 0)
 
     def test_follow_on_authors(self):
-        """Проверка записей у подписаных и неподписаных."""
-        self.author_client.get(
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': self.post_autor.username}))
-        get_posts = self.author_client.get(reverse('posts:follow_index'))
-        posts = get_posts.context.get('page_obj').object_list
-        self.assertEqual(len(posts), 1)
-        Post.objects.create(
-            text='Проверка новая запись',
+        """Проверка записей у тех кто подписан."""
+        post = Post.objects.create(
+            author=self.post_autor,
+            text="Подпишись на меня")
+        Follow.objects.create(
+            user=self.post_follower,
             author=self.post_autor)
-        follow_new_record = self.author_client.get(
+        response = self.author_client.get(
             reverse('posts:follow_index'))
-        new_record = follow_new_record.context.get('page_obj').object_list
-        not_follow = self.follower_client.get(reverse('posts:follow_index'))
-        page_not_follow = not_follow.context.get('page_obj').object_list
-        self.assertEqual(len(new_record), 2)
-        self.assertEqual(new_record[1].text, self.post.text)
-        self.assertEqual(new_record[1].author, self.post_autor)
-        self.assertEqual(len(page_not_follow), 0)
+        self.assertIn(post, response.context['page_obj'].object_list)
+
+    def test_notfollow_on_authors(self):
+        """Проверка записей у тех кто не подписан."""
+        post = Post.objects.create(
+            author=self.post_autor,
+            text="Подпишись на меня")
+        response = self.author_client.get(
+            reverse('posts:follow_index'))
+        self.assertNotIn(post, response.context['page_obj'].object_list)

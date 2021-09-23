@@ -21,8 +21,9 @@ class PostFormTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.post_author = User.objects.create_user(
-            username='post_author',
-        )
+            username='post_author')
+        cls.comm_author = User.objects.create_user(
+            username='comm_author')
         cls.group = Group.objects.create(
             title='Тестовое название группы',
             slug='test_slug',
@@ -38,6 +39,8 @@ class PostFormTests(TestCase):
         self.guest_user = Client()
         self.authorized_user = Client()
         self.authorized_user.force_login(self.post_author)
+        self.auth_user_comm = Client()
+        self.auth_user_comm.force_login(self.comm_author)
 
     def test_authorized_user_create_post(self):
         """Проверка создания записи авторизированным клиентом."""
@@ -85,7 +88,7 @@ class PostFormTests(TestCase):
             text='Текст поста для редактирования',
             author=self.post_author)
         form_data = {'text': 'Тестовый коментарий'}
-        response = self.authorized_user.post(
+        response = self.auth_user_comm.post(
             reverse(
                 'posts:add_comment',
                 kwargs={'post_id': post.id}),
@@ -94,7 +97,8 @@ class PostFormTests(TestCase):
         comment = Comment.objects.latest('id')
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         self.assertEqual(comment.text, form_data['text'])
-        self.assertEqual(comment.text, str(response.context['comments'][0]))
+        self.assertEqual(comment.author, self.comm_author)
+        self.assertEqual(comment.post_id, post.id)
         self.assertRedirects(
             response, reverse('posts:post_detail', args={post.id}))
 
