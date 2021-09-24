@@ -11,7 +11,7 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
-# @cache_page(20)
+@cache_page(20)
 def index(request):
     paginator = Paginator(
         Post.objects.all(),
