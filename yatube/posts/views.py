@@ -11,7 +11,7 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
-@cache_page(20)
+# @cache_page(20)
 def index(request):
     paginator = Paginator(
         Post.objects.all(),
@@ -49,14 +49,14 @@ def profile(request, username):
     page_obj = paginator.get_page(
         request.GET.get('page')
     )
-    following_ = request.user.is_authenticated
-    if following_:
-        following_ = author.following.filter(user=request.user).exists()
+    following = request.user.is_authenticated
+    if following:
+        following = author.following.filter(user=request.user).exists()
     template = 'posts/profile.html'
     context = {
         'page_obj': page_obj,
         'author': author,
-        'following': following_
+        'following': following
     }
     return render(request, template, context)
 

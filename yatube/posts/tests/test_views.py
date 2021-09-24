@@ -200,22 +200,29 @@ class FollowViewsTest(TestCase):
 
     def test_follow_on_user(self):
         """Проверка подписки на пользователя."""
+        count_follow = Follow.objects.count()
         self.follower_client.post(
             reverse(
                 'posts:profile_follow',
                 kwargs={'username': self.post_follower}))
-        self.assertEqual(Follow.objects.count(), 1)
+        follow = Follow.objects.filter(
+            user=self.post_autor,
+            author=self.post_follower)
+        self.assertEqual(Follow.objects.count(), count_follow + 1)
+        self.assertEqual(follow[0].author_id, self.post_follower.id)
+        self.assertEqual(follow[0].user_id, self.post_autor.id)
 
     def test_unfollow_on_user(self):
         """Проверка отписки от пользователя."""
         Follow.objects.create(
             user=self.post_autor,
             author=self.post_follower)
+        count_follow = Follow.objects.count()
         self.follower_client.post(
             reverse(
                 'posts:profile_unfollow',
                 kwargs={'username': self.post_follower}))
-        self.assertEqual(Follow.objects.count(), 0)
+        self.assertEqual(Follow.objects.count(), count_follow - 1)
 
     def test_follow_on_authors(self):
         """Проверка записей у тех кто подписан."""
