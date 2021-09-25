@@ -3,7 +3,7 @@
 {% load thumbnail %}
 {% block title %}Подписки{% endblock %}
 {% block content %}
-{% include 'posts/includes/switcher.html' with follow='follow' %}
+{% include 'posts/includes/switcher.html' with follow=True %}
 {% for post in page_obj %}
 
     <ul class="list-group">

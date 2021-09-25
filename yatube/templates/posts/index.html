@@ -2,7 +2,7 @@
 {% load thumbnail %}
 {% block title %}Последние обновления на сайте{% endblock %}
 {% block content %}
-{% include 'posts/includes/switcher.html' with index="index"%}
+{% include 'posts/includes/switcher.html' with index=True %}
 {% for post in page_obj %}
 <ul>
   <li>
