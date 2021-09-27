@@ -32,7 +32,5 @@
 
 {% if not forloop.last %}<hr>{% endif %}
 {% endfor %}
-<div class="d-flex justify-content-center">
-    {% include 'posts/includes/paginator.html' %}
-</div>
+{% include 'posts/includes/paginator.html' %}
 {% endblock %}

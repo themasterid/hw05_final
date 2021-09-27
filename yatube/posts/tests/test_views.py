@@ -209,13 +209,9 @@ class FollowViewsTest(TestCase):
             text="Подпишись на меня",
             author=self.post_follower)
         follow = Follow.objects.all().latest('id')
-        follow_not_none = Follow.objects.get(
-            user=self.post_autor,
-            author=self.post_follower)
         self.assertEqual(Follow.objects.count(), count_follow + 1)
         self.assertEqual(follow.author_id, self.post_follower.id)
         self.assertEqual(follow.user_id, self.post_autor.id)
-        self.assertIsNotNone(follow_not_none)
 
     def test_unfollow_on_user(self):
         """Проверка отписки от пользователя."""
