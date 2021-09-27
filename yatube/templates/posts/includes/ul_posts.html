@@ -1,0 +1,10 @@
+<ul class="list-group shadow-lg p-1 mb-1 bg-white rounded">
+  <li class="list-group-item list-group-item-light">
+    Автор: <a href="{% url 'posts:profile' post.author %}">
+      {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}
+    </a>
+  </li>
+  <li class="list-group-item list-group-item-light">
+    Дата публикации: <strong>{{ post.pub_date|date:'d E Y' }}</strong>
+  </li>
+</ul>

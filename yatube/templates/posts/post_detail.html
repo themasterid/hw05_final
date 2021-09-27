@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% load thumbnail %}
+{% load static %}
 {% block title %}Пост {{ post|truncatechars:30 }}{% endblock %}
 {% block content %}
-<div class="row">
-  <aside class="col-12 col-md-3">
+<div class="row shadow-lg p-2 mb-2 bg-white rounded">
+  <aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
     <ul class="list-group list-group-flush">
       <li class="list-group-item">
         Дата публикации: {{ post.pub_date|date:'d E Y' }}
@@ -25,41 +25,71 @@
       </li>
     </ul>
   </aside>
+  
   <article class="col-12 col-md-9">
-
-<div class="card bg-light" style="width: 100%">
-  {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
-  <img class="card-img-top" src="{{ im.url }}">
-  {% endthumbnail %}
-  <div class="card-body">
-    <h4 class="card-title">Заголовок</h4>
-    <p class="card-text">
-      {{ post.text|linebreaksbr }}
-    </p>
-    {% if post.author == requser %}
-      <a class="btn btn-primary" href="{% url 'posts:edit' post.id %}">
-        Редактировать запись
-      </a>
-    {% endif %}
-  </div>
-</div>
-    {% load user_filters %}
-    {% if comments.count != 0 %}
-    {% with comments.count as total_comments %}
-    <hr>
-    <figure>
-      <blockquote class="blockquote">
-        <div class="shadow-sm p-2 bg-white rounded">
-          Комментариев {{ total_comments }}
+    {% include 'posts/includes/post_block.html' %}
+    <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
+      {% if post.author == requser %}
+        <a href="{% url 'posts:edit' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Редактировать</button></a>
+        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#exampleModalCenter">
+          Удалить запись
+        </button>
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Удаление записи!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Вы действительно ходите удалить запись?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Закрыть</button>
+                <a href="{% url 'posts:delete' post.id %}"><button type="button" class="btn btn-outline-danger btn-sm">Удалить запись</button></a>
+              </div>
+            </div>
+          </div>
         </div>
-      </blockquote>
-    </figure>
-    {% endwith %}
-    {% endif %}
+        {% endif %}
+      </div>
 
-    {% if user.is_authenticated %}
-      <div class="card my-4">
-        <h5 class="card-header">Добавить комментарий:</h5>
+      {% load user_filters %}
+      {% if comments.count != 0 %}
+      {% with comments.count as total_comments %}
+      <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
+      Комментариев {{ total_comments }}
+      </div>
+      {% endwith %}
+      {% endif %}
+
+      {% for comment in comments %}
+      <div class="card mb-2 shadow-lg p-2 mb-2 bg-white rounded" style="max-width: 100%;">
+        <div class="row no-gutters">
+          <div class="col-md-2">
+            <img src="{% static 'img/no_img.png' %}" class="card-img" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <a href="{% url 'posts:profile' comment.author.username %}"><h5 class="card-title">{{ comment.author.get_full_name }}</h5></a>
+              <p class="card-text">{{ comment.text|linebreaks }}</p>
+              <p class="card-text"><small class="text-muted">{{ comment.created|date:'d E Y' }}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% empty %}
+      <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
+      Комментариев нет, будь первым! 
+      </div>
+      {% endfor %}
+
+      {% if user.is_authenticated %}
+      <div class="card shadow-lg p-2 mb-2 bg-white rounded">
+        <h5 class="card-header bg-white">Добавить комментарий:</h5>
           <div class="card-body">
             <form method="post" action="{% url 'posts:add_comment' post.id %}">
               {% csrf_token %}      
@@ -70,35 +100,7 @@
             </form>
           </div>
       </div>
-    {% endif %}
-
-    {% for comment in comments %}
-      <div class="media mb-4">
-        <div class="media-body">
-          <div class="alert alert-primary" role="alert">
-            {{ comment.created|date:'d E Y' }} <a href="{% url 'posts:profile' comment.author.username %}">{{ comment.author.get_full_name }}</a>:
-          </div>
-          <figure>
-            <blockquote class="blockquote">
-              <div class="shadow-sm p-3 bg-white">
-                {{ comment.text|linebreaks }}
-              </div>
-            </blockquote>
-          </figure>
-        </div>
-      </div>
-
-    {% empty %}
-    <hr>
-    <figure>
-      <blockquote class="blockquote">
-        <div class="shadow-sm p-2 bg-white rounded">
-          Комментариев нет, будь первым! 
-        </div>
-      </blockquote>
-    </figure>
-    {% endfor %}
-
+      {% endif %}
 </article>
 </div>
 {% endblock %}

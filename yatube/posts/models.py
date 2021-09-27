@@ -28,8 +28,13 @@ class Group(models.Model):
 
 
 class Post(models.Model):
+    title = models.CharField(
+        max_length=200,
+        verbose_name='Заголовок',
+        help_text='Заголовок нового поста'
+    )
     text = models.TextField(
-        max_length=400,
+        max_length=12000,
         verbose_name='Текст поста',
         help_text='Текст нового поста'
     )
@@ -55,7 +60,8 @@ class Post(models.Model):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True
+        blank=True,
+        help_text='Картинка в шапку поста'
     )
 
     class Meta:

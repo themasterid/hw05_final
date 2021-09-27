@@ -7,6 +7,7 @@ from .models import Comment, Follow, Group, Post
 class PostAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
+        'title',
         'text',
         'pub_date',
         'author',
