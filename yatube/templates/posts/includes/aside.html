@@ -46,10 +46,12 @@
         <li class="list-group-item">
             Всего постов автора: {{ post.author.posts.count }}
         </li>
+        {% if user.is_authenticated %}
         <li class="list-group-item">
             <a href="{% url 'users:update_profile' %}" class="link-light text-decoration-none" style="color: black;">
             Редактировать профиль
             </a>
         </li>
+        {% endif %}
     </ul>
   </aside>

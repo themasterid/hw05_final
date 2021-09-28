@@ -84,7 +84,7 @@ def user_profile(request, username):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    prof = get_object_or_404(Profile, user=request.user)
+    prof = get_object_or_404(Profile, user=post.author)
     comments = post.comments.all()
     form = CommentForm()
     template = 'posts/post_detail.html'
