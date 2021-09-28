@@ -12,6 +12,9 @@ urlpatterns = [
     path('group/<slug:slug>/', views.group_posts, name='group_list'),
     path('', views.index, name='index'),
     path('profile/<str:username>/', views.profile, name='profile'),
+    path(
+        'user_profile/<str:username>/',
+        views.user_profile, name='user_profile'),
     path('posts/<int:post_id>/', views.post_detail, name='post_detail'),
     path(
         'posts/<int:post_id>/comment/', views.add_comment, name='add_comment'),

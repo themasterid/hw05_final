@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import cache_page
+from users.models import Profile
 
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post
@@ -62,8 +63,28 @@ def profile(request, username):
     return render(request, template, context)
 
 
+def user_profile(request, username):
+    author = get_object_or_404(User, username=username)
+    prof = get_object_or_404(Profile, user=author)
+    paginator = Paginator(
+        author.posts.all(),
+        settings.NUMBER_POST - 5
+    )
+    page_obj = paginator.get_page(
+        request.GET.get('page')
+    )
+    template = 'posts/user_profile.html'
+    context = {
+        'author': author,
+        'prof': prof,
+        'page_obj': page_obj,
+    }
+    return render(request, template, context)
+
+
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
+    prof = get_object_or_404(Profile, user=request.user)
     comments = post.comments.all()
     form = CommentForm()
     template = 'posts/post_detail.html'
@@ -72,6 +93,7 @@ def post_detail(request, post_id):
         'requser': request.user,
         'comments': comments,
         'form': form,
+        'prof': prof,
     }
     return render(request, template, context)
 

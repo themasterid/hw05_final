@@ -6,12 +6,17 @@
   {% for post in page_obj %}
     {% include 'posts/includes/ul_posts.html' %}
     {% include 'posts/includes/post_block.html' %}
-    <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
-        <a href="{% url 'posts:post_detail' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Подробная информация</button></a>  
-        {% if post.group %}
+
+    <ul class="list-group shadow-lg p-1 mb-2 bg-white rounded">
+      <li class="list-group-item list-group-item-light">
+      <a href="{% url 'posts:post_detail' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Подробная информация</button></a>
+      </a>
+      {% if post.group %}
         <a href="{% url 'posts:group_list' post.group.slug %}"><button type="button" class="btn btn-outline-primary btn-sm">Все записи группы {{ post.group }}</button></a>
-        {% endif %}
-    </div>
+      {% endif %}
+      </li>
+    </ul>
+
     {% if not forloop.last %}{% endif %}
   {% endfor %}
   {% include 'posts/includes/paginator.html' %}

@@ -1,10 +1,15 @@
-<ul class="list-group shadow-lg p-1 mb-1 bg-white rounded">
-  <li class="list-group-item list-group-item-light">
-    Автор: <a href="{% url 'posts:profile' post.author %}">
-      {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}
-    </a>
-  </li>
-  <li class="list-group-item list-group-item-light">
-    Дата публикации: <strong>{{ post.pub_date|date:'d E Y' }}</strong>
+<ul class="list-group shadow-lg p-1 mb-2 bg-white rounded">
+  <li class="list-group-item list-group-item-light d-flex justify-content-between">
+  <span>
+  Автор:
+  <strong> 
+  <a href="{% url 'posts:profile' post.author %}" class="link-light text-decoration-none" style="color: black;">
+    {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}
+  </a>
+  </strong>
+  </span>
+  <span>
+  Дата публикации: <strong style="color: black;">{{ post.pub_date|date:'d E Y' }}</strong>
+  </span>
   </li>
 </ul>
