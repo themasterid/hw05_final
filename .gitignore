@@ -2,7 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+secret_settings.txt
+_db.sqlite3
 # C extensions
 *.so
 *.bat
