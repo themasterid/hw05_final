@@ -2,27 +2,14 @@
 {% load thumbnail %}
 <aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
     <ul class="list-group list-group-flush">
-        <li class="list-group-item shadow-lg p-2 mb-2 bg-white rounded text-center">
-            <button type="button" class="btn" data-toggle="modal" data-target=".bd-example-modal-lg">
-            {% thumbnail prof.avatar "1000" as big %}
-                {% thumbnail prof.avatar "150x150" crop="center" as small %}
-                    <img class="rounded mx-auto d-block" src="{{ small.url }}">
-                {% endthumbnail %}
-                {% empty %}
-                <div class="col-md-12">
-                    <img src="{% static 'img/no_img.png' %}" class="card-img" alt="нет фото">
-                </div>
-            {% endthumbnail %}
-            </button>
-            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        {% thumbnail prof.avatar "x500" crop="center" as small %}
-                            <img class="rounded mx-auto d-block" src="{{ small.url }}">
-                        {% endthumbnail %}
-                    </div>
-                </div>
+        <li class="list-group-item shadow-lg p-2 mb-2 bg-white">
+            {% thumbnail profile.avatar "x150" crop="center" as small %}
+                <img class="img-fluid img-thumbnail mx-auto card-img" src="{{ small.url }}">
+            {% empty %}
+            <div class="col-md-12">
+                <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
             </div>
+            {% endthumbnail %}
         </li>
         <li class="list-group-item">
             Дата публикации: <strong>{{ post.pub_date|date:'d E Y' }}</strong>
@@ -47,11 +34,13 @@
             Всего постов автора: {{ post.author.posts.count }}
         </li>
         {% if user.is_authenticated %}
-        <li class="list-group-item">
-            <a href="{% url 'users:update_profile' %}" class="link-light text-decoration-none" style="color: black;">
-            Редактировать профиль
-            </a>
-        </li>
+            {% if request.user == post.author %}
+                <li class="list-group-item">
+                    <a href="{% url 'users:update_profile' %}" class="link-light text-decoration-none" style="color: black;">
+                    Редактировать профиль
+                    </a>
+                </li>
+            {% endif %}
         {% endif %}
     </ul>
-  </aside>
+</aside>

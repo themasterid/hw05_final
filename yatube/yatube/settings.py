@@ -2,17 +2,16 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = 's3vk^7l6+rf$b4(k1_wuik6cn&$z!zm&w!35@eyc9$(ur9vx@r'
+with open('C:/DEV/YP/hw05_final/secret_settings.txt') as f:
+    SECRET_KEY = f.read().strip()
 
-DEBUG = True
+DEBUG = False
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-    'testserver',
+    'themasterid.pythonanywhere.com',
+    '*',
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
@@ -38,6 +37,8 @@ INSTALLED_APPS = [
     'posts.apps.PostsConfig',
     'about.apps.AboutConfig',
     'core.apps.CoreConfig',
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -117,9 +118,46 @@ STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
 
-NUMBER_POST = 10
+NUMBER_POST = 5
 
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 INTERNAL_IPS = ('127.0.0.1', '192.168.0.1',)
+
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': [
+            [
+                'Undo', 'Redo',
+                '-', 'Bold', 'Italic', 'Underline',
+                '-', 'Link', 'Unlink', 'Anchor',
+                '-', 'Format',
+                '-', 'Maximize',
+                # '-', 'Table',
+                '-', 'Image',
+                '-', 'Source',
+                '-', 'NumberedList', 'BulletedList'
+            ],
+            [
+                'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock',
+                '-', 'Font', 'FontSize', 'TextColor',
+                '-', 'Outdent', 'Indent',
+                '-', 'HorizontalRule',
+                '-', 'Blockquote'
+            ]
+        ],
+        'height': 300,
+        'width': '100%',
+        'toolbarCanCollapse': False,
+        'forcePasteAsPlainText': True
+    }
+}
+
+CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
+CKEDITOR_RESTRICT_BY_USER = True
+CKEDITOR_BROWSE_SHOW_DIRS = True
+AWS_QUERYSTRING_AUTH = False

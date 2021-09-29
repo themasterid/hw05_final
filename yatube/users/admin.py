@@ -11,8 +11,9 @@ class ProfileAdmin(admin.ModelAdmin):
         'bio',
         'location',
         'birth_date',
+        'avatar',
     )
-    list_editable = ('bio',)
+    list_editable = ('location',)
     search_fields = ('location',)
     list_filter = ('birth_date',)
     empty_value_display = '-пусто-'

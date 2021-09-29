@@ -3,21 +3,53 @@
 {% block title %}Технологии{% endblock %}
 {% block content %}
 <div class="row">
-  <h1>Технологии</h1>
+  <div class="alert alert-primary" role="alert">
+    <h1>Технологии</h1>
+  </div>
   <aside class="col-12 col-md-3">
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item">
-        Python
-      </li>
-      <li class="list-group-item">
-        Django
-      </li>
-    </ul>
+      <div class="alert alert-secondary" role="alert">
+        <a href="https://www.python.org/downloads/" class="alert-link">Python 3.9</a>
+      </div>
+      <div class="alert alert-secondary" role="alert">
+        <a href="https://www.djangoproject.com/" class="alert-link">Django 2.2.19</a>
+      </div>
+      <div class="alert alert-secondary" role="alert">
+        <a href="https://getbootstrap.com/" class="alert-link">Bootstrap 4</a>
+      </div>
+      <div class="alert alert-secondary" role="alert">
+        <a href="https://django-ckeditor.readthedocs.io/en/latest/" class="alert-link">CKEditor</a>
+      </div>
   </aside>
   <article class="col-12 col-md-9">
-    <p>Текст страницы "Технологии"<hr>
-    На этой странице можно рассказать, какие программные инструменты вы применили для создания этого сайта, какие навыки вам помогли, с чем вы хорошо разобрались, а с чем — не очень. Картинки и нестандартные подходы приветствуются: эта страница может получиться очень интересной.
-    </p>
+    <div class="alert alert-success" role="alert">
+      <h4 class="alert-heading">Проект блог социальная сеть PyBlog</h4>
+      <p>В этом блоге можно создавать посты, делиться фотографиями и ионформацией в нужных вам группах.
+      На данный момент реализована возможность создать запись, отредактировать ее, и размесить на сайте.
+      Так ж реализована возможность регистрации пользователей, востановвления паролей (отправка на почту не реальзована).
+      Система учета доступа пользователей. Для редактирования записей реализовали CKEditor, это удобно.
+      Это только начал опути, по мере развития проекта, инфомрация о новых возможнастях будет публикаваться в этом разделе.
+      </p>
+      <hr>
+      <p class="mb-0">Все вопросы, а так же подробная информация и контактные данные можно найти в разделе "Об авторе"</p>
+    </div>
   </article>
 </div>
 {% endblock %}
+
+<ul>
+<li>
+  HTML, CSS, JavaScript, Bootstrap, <strong>SQL</strong>, Redis
+</li>
+<li>
+  <strong>Python</strong>, Kotlin, Golang
+</li>
+<li>
+  <strong>Django</strong>, <strong>Django Rest Framework</strong>, Flask
+</li>
+<li>
+  <strong>Алгоритмы и структуры данных</strong>
+</li>
+<li>
+  <strong>Docker</strong>
+</li>
+</ul>

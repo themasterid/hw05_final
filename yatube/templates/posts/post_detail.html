@@ -1,17 +1,25 @@
 {% extends "base.html" %}
 {% load static %}
+{% load thumbnail %}
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
   {% include 'posts/includes/aside.html' %}
   <article class="col-12 col-md-9">
-    {% include 'posts/includes/post_block.html' %}
-    <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
-      {% if post.author == requser %}
-        <a href="{% url 'posts:edit' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Редактировать</button></a>
-        <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#exampleModalCenter">
-          Удалить запись
-        </button>
+    <div class="card shadow-lg p-1 mb-1 bg-white rounded" style="width: 100%">
+      {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+        <img class="card-img-top" src="{{ im.url }}">
+      {% endthumbnail %}
+      <div class="card-body">
+        <h4 class="card-title">        
+        | {{ post.title }} | 
+        {% if post.author == requser %}
+        <a href="{% url 'posts:edit' post.id %}" class="link-light text-decoration-none">
+        <img src="{% static 'img/edit_btn.gif' %}" width='24px;' height='24px;'>
+        </a> |
+        <a href="{% url 'posts:edit' post.id %}" class="link-light text-decoration-none"  data-toggle="modal" data-target="#exampleModalCenter">
+        <img src="{% static 'img/delete_btn.gif' %}" width='24px;' height='24px;'>
+        </a>
         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -32,7 +40,11 @@
           </div>
         </div>
         {% endif %}
+        </h4>
+        <hr>
+        <p class="card-text">{{ post.text|safe|linebreaks }}</p>
       </div>
+    </div>
 
       {% load user_filters %}
       {% if comments.count != 0 %}
@@ -44,35 +56,19 @@
       {% endif %}
 
       {% for comment in comments %}
-      <div class="card mb-2 shadow-lg p-2 mb-2 bg-white rounded" style="max-width: 100%;">
-        <div class="row no-gutters">
-          <div class="col-md-2 text-center">
-            {% load thumbnail %}
-            <button type="button" class="btn" data-toggle="modal" data-target=".bd-example-modal-lg">
-            {% thumbnail prof.avatar "1000" as big %}
-                {% thumbnail prof.avatar "x80" as small %}
-                    <img src="{{ small.url }}">
-                {% endthumbnail %}
-                {% empty %}
-                <div class="col-md-12">
-                    <img src="{% static 'img/no_img.png' %}" class="card-img" alt="нет фото">
-                </div>
+      <div class="card shadow-lg p-2 mb-2 bg-white rounded" style="max-width: 100%;">
+        <div class="row p-2 mb-2">
+          <div class="col-md-2">
+            {% thumbnail comment.author.profile.avatar "x800" as small_comm %}
+              <img class="img-fluid img-thumbnail mx-auto card-img" src="{{ small_comm.url }}">
+            {% empty %}
+              <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
             {% endthumbnail %}
-            </button>
-            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        {% thumbnail prof.avatar "x600" crop="center" as small %}
-                            <img src="{{ small.url }}">
-                        {% endthumbnail %}
-                    </div>
-                </div>
-            </div>
           </div>
-          <div class="col-md-8">
-            <div class="card-body">
+          <div class="col">
+            <div class="card-body mw-100 rounded bg-light">
               <a href="{% url 'posts:profile' comment.author.username %}"><h5 class="card-title">{{ comment.author.get_full_name }}</h5></a>
-              <p class="card-text">{{ comment.text|linebreaks }}</p>
+              <p class="card-text">{{ comment.text|safe|linebreaks }}</p>
               <p class="card-text"><small class="text-muted">{{ comment.created|date:'d E Y' }}</small></p>
             </div>
           </div>
@@ -86,18 +82,16 @@
       {% endfor %}
 
       {% if user.is_authenticated %}
-      <div class="card shadow-lg p-2 mb-2 bg-white rounded">
-        <h5 class="card-header bg-white">Добавить комментарий:</h5>
-          <div class="card-body">
+          <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
             <form method="post" action="{% url 'posts:add_comment' post.id %}">
-              {% csrf_token %}      
-              <div class="form-group mb-2">
+              {% csrf_token %}
+              {{ form.media }}
+              <div class="form-group mb-1">
                 {{ form.text|addclass:"form-control" }}
               </div>
               <button type="submit" class="btn btn-primary">Отправить комментарий</button>
             </form>
           </div>
-      </div>
       {% endif %}
 </article>
 </div>

@@ -1,6 +1,4 @@
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -11,7 +9,7 @@ from .forms import CreationForm, ProfileForm, UserForm
 
 class SignUp(CreateView):
     form_class = CreationForm
-    success_url = reverse_lazy('posts:index')
+    success_url = reverse_lazy('users:login')
     template_name = 'users/signup.html'
 
 

@@ -1,3 +1,5 @@
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -33,10 +35,12 @@ class Post(models.Model):
         verbose_name='Заголовок',
         help_text='Заголовок нового поста'
     )
-    text = models.TextField(
+    text = RichTextUploadingField(
+        blank=True,
+        null=True,
         max_length=12000,
         verbose_name='Текст поста',
-        help_text='Текст нового поста'
+        help_text='<br>Текст нового поста'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -84,7 +88,9 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор')
-    text = models.TextField(
+    text = RichTextField(
+        blank=True,
+        null=True,
         verbose_name='Коментарий')
     created = models.DateTimeField(
         auto_now_add=True,
@@ -102,7 +108,7 @@ class Comment(models.Model):
         verbose_name = 'Коментарий'
 
     def __str__(self):
-        return self.text[:15]
+        return self.text
 
 
 class Follow(models.Model):

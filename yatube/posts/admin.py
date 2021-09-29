@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from .models import Comment, Follow, Group, Post
 
@@ -8,7 +9,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'title',
-        'text',
+        'text_safe',
         'pub_date',
         'author',
         'group'
@@ -17,6 +18,9 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('text',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
+
+    def text_safe(self, obj):
+        return mark_safe(f'{obj.text[:100]}...')
 
 
 @admin.register(Group)
@@ -33,9 +37,12 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('post', 'author', 'text', 'created', 'active')
+    list_display = ('author', 'text_safe', 'created', 'active')
     list_filter = ('active', 'text', 'created', 'updated')
     search_fields = ('post', 'author', 'text')
+
+    def text_safe(self, obj):
+        return mark_safe(obj.text)
 
 
 @admin.register(Follow)

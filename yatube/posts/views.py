@@ -13,7 +13,7 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
-@cache_page(20)
+@cache_page(20, key_prefix='page_obj')
 def index(request):
     paginator = Paginator(
         Post.objects.all(),
@@ -65,10 +65,10 @@ def profile(request, username):
 
 def user_profile(request, username):
     author = get_object_or_404(User, username=username)
-    prof = get_object_or_404(Profile, user=author)
+    profile = get_object_or_404(Profile, user=author)
     paginator = Paginator(
         author.posts.all(),
-        settings.NUMBER_POST - 5
+        settings.NUMBER_POST
     )
     page_obj = paginator.get_page(
         request.GET.get('page')
@@ -76,7 +76,7 @@ def user_profile(request, username):
     template = 'posts/user_profile.html'
     context = {
         'author': author,
-        'prof': prof,
+        'profile': profile,
         'page_obj': page_obj,
     }
     return render(request, template, context)
@@ -84,7 +84,7 @@ def user_profile(request, username):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    prof = get_object_or_404(Profile, user=post.author)
+    profile = get_object_or_404(Profile, user=post.author)
     comments = post.comments.all()
     form = CommentForm()
     template = 'posts/post_detail.html'
@@ -93,7 +93,7 @@ def post_detail(request, post_id):
         'requser': request.user,
         'comments': comments,
         'form': form,
-        'prof': prof,
+        'profile': profile,
     }
     return render(request, template, context)
 

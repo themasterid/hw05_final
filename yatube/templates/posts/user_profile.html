@@ -4,42 +4,29 @@
 {% block title %}Профиль пользователя{% endblock %}
 {% block content %}
 
-<div class="row shadow-lg p-2 mb-2 bg-white rounded">
-  <aside class="col-12 col-md-3">
+<div class="row shadow-lg p-2 mb-2 bg-white">
+<aside class="col-12 col-md-3">
     <ul class="list-group list-group-flush">
-        <li class="list-group-item shadow-lg p-2 mb-2 bg-white rounded text-center">
-            <button type="button" class="btn" data-toggle="modal" data-target=".bd-example-modal-lg">
-            {% thumbnail prof.avatar "1000" as big %}
-                {% thumbnail prof.avatar "x150" crop="center" as small %}
-                    <img class="rounded" src="{{ small.url }}">
-                {% endthumbnail %}
-                {% empty %}
+        <li class="list-group-item">
+            {% thumbnail profile.avatar "x150" crop="center" as small %}
+                <img class="img-fluid img-thumbnail mx-auto card-img" class="rounded" src="{{ small.url }}">
+            {% empty %}
                 <div class="col-md-12">
-                    <img src="{% static 'img/no_img.png' %}" class="card-img" alt="нет фото">
+                    <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
                 </div>
             {% endthumbnail %}
-            </button>
-            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        {% thumbnail prof.avatar "x600" crop="center" as small %}
-                            <img src="{{ small.url }}">
-                        {% endthumbnail %}
-                    </div>
-                </div>
-            </div>
         </li>
         <li class="list-group-item">
         Полное имя: {{ author.get_full_name }}
         </li>
         <li class="list-group-item">
-        Проживание: {{ prof.location }}
+        Проживание: {{ profile.location }}
         </li>
         <li class="list-group-item">
-        О себе: {{ prof.bio }}
+        О себе: {{ profile.bio }}
         </li>
         <li class="list-group-item">
-        Дата рождения: {{ prof.birth_date }}
+        Дата рождения: {{ profile.birth_date }}
         </li>
         <li class="list-group-item">
         <a href="{% url 'users:update_profile' %}" class="link-light text-decoration-none" style="color: black;">
@@ -47,8 +34,8 @@
         </a>
         </li>
     </ul>
-  </aside>
-  <article class="col-12 col-md-9">
+</aside>
+<article class="col-12 col-md-9">
     {% for post in page_obj %}
         {% include 'posts/includes/ul_posts.html' %}
         {% include 'posts/includes/post_block.html' %}
@@ -66,6 +53,6 @@
         {% if not forloop.last %}{% endif %}
     {% endfor %}
     {% include 'posts/includes/paginator.html' %}
-    </article>
+</article>
 </div>
 {% endblock %}
