@@ -9,18 +9,22 @@ class PostAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'title',
-        'text_safe',
         'pub_date',
         'author',
-        'group'
+        'group',
+        'get_image',
     )
-    list_editable = ('group',)
+    readonly_fields = ('get_image', )
+    # list_editable = ('group',)
     search_fields = ('text',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
 
-    def text_safe(self, obj):
-        return mark_safe(f'{obj.text[:100]}...')
+    def get_image(self, obj):
+        return mark_safe(
+            f'<img src={obj.image.url} width="20%"')
+
+    get_image.short_description = 'Картинка'
 
 
 @admin.register(Group)
@@ -30,6 +34,7 @@ class GroupAdmin(admin.ModelAdmin):
         'slug',
         'description',
     )
+    prepopulated_fields = {'slug': ('title',)}
     search_fields = ('slug',)
     list_filter = ('title',)
     empty_value_display = '-пусто-'
@@ -50,3 +55,7 @@ class FollowAdmin(admin.ModelAdmin):
     list_display = ('user', 'author')
     list_filter = ('user', 'author')
     search_fields = ('user', 'author')
+
+
+admin.site.site_title = 'DJANGO PYBLOG'
+admin.site.site_header = 'DJANGO PYBLOG'

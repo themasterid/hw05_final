@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.cache import cache_page
+# from django.views.decorators.cache import cache_page
 from users.models import Profile
 
 from .forms import CommentForm, PostForm
@@ -13,73 +13,50 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
-@cache_page(20, key_prefix='page_obj')
-def index(request):
+def get_paginator(request, req):
     paginator = Paginator(
-        Post.objects.all(),
+        req,
         settings.NUMBER_POST
     )
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    template = 'posts/index.html'
-    context = {
-        'page_obj': page_obj,
-    }
-    return render(request, template, context)
+    return paginator.get_page(page_number)
+
+
+# @cache_page(20, key_prefix='index_page')
+def index(request):
+    posts = Post.objects.select_related('author', 'group')
+    page_obj = get_paginator(request, posts)
+    return render(
+        request, 'posts/index.html', {'page_obj': page_obj})
 
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    paginator = Paginator(
-        group.posts.all(),
-        settings.NUMBER_POST
-    )
-    page_obj = paginator.get_page(
-        request.GET.get('page')
-    )
-    template = 'posts/group_list.html'
+    posts = group.posts.select_related('author').filter(group=group)
+    page_obj = get_paginator(request, posts)
     context = {'group': group, 'page_obj': page_obj}
-    return render(request, template, context)
+    return render(
+        request, 'posts/group_list.html', context)
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    paginator = Paginator(
-        author.posts.all(),
-        settings.NUMBER_POST
-    )
-    page_obj = paginator.get_page(
-        request.GET.get('page')
-    )
+    posts = author.posts.select_related('author').filter(author=author)
+    page_obj = get_paginator(request, posts)
+    profile = get_object_or_404(
+        Profile.objects.select_related('user'),
+        user=author)
     following = request.user.is_authenticated
     if following:
         following = author.following.filter(user=request.user).exists()
-    template = 'posts/profile.html'
     context = {
         'page_obj': page_obj,
         'author': author,
-        'following': following
-    }
-    return render(request, template, context)
-
-
-def user_profile(request, username):
-    author = get_object_or_404(User, username=username)
-    profile = get_object_or_404(Profile, user=author)
-    paginator = Paginator(
-        author.posts.all(),
-        settings.NUMBER_POST
-    )
-    page_obj = paginator.get_page(
-        request.GET.get('page')
-    )
-    template = 'posts/user_profile.html'
-    context = {
-        'author': author,
+        'following': following,
         'profile': profile,
-        'page_obj': page_obj,
     }
-    return render(request, template, context)
+    return render(
+        request, 'posts/profile.html', context)
 
 
 def post_detail(request, post_id):
@@ -147,8 +124,8 @@ def post_delete(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
         return redirect('posts:post_detail', post_id)
-    cache.clear()
     post.delete()
+    cache.clear()
     return redirect('posts:profile', post.author)
 
 

@@ -2,54 +2,43 @@
 {% extends "base.html" %}
 {% block title %}Технологии{% endblock %}
 {% block content %}
-<div class="row">
-  <div class="alert alert-primary" role="alert">
-    <h1>Технологии</h1>
+
+<div class="row p-2 mb-2 shadow-lg rounded bg-light">
+  
+  <div class="card p-2 mb-2 shadow-lg p-2 mb-2 rounded bg-light">
+    <div class="card-body shadow-lg">
+      <h1 class="card-title">Технологии</h1>
+    </div>
   </div>
-  <aside class="col-12 col-md-3">
-      <div class="alert alert-secondary" role="alert">
-        <a href="https://www.python.org/downloads/" class="alert-link">Python 3.9</a>
-      </div>
-      <div class="alert alert-secondary" role="alert">
-        <a href="https://www.djangoproject.com/" class="alert-link">Django 2.2.19</a>
-      </div>
-      <div class="alert alert-secondary" role="alert">
-        <a href="https://getbootstrap.com/" class="alert-link">Bootstrap 4</a>
-      </div>
-      <div class="alert alert-secondary" role="alert">
-        <a href="https://django-ckeditor.readthedocs.io/en/latest/" class="alert-link">CKEditor</a>
+
+  <aside class="col-12 col-md-3 p-1 shadow-lg p-2 mb-2 rounded bg-light">
+      <div class="list-group">
+        <a href="https://www.python.org/downloads/" class="list-group-item list-group-item-action" target="_blank">Python</a>
+        <a href="https://www.djangoproject.com/" class="list-group-item list-group-item-action" target="_blank">Django</a>
+        <a href="https://getbootstrap.com/" class="list-group-item list-group-item-action" target="_blank">Bootstrap 4</a>
+        <a href="https://django-ckeditor.readthedocs.io/en/latest/" class="list-group-item list-group-item-action" target="_blank">CKEditor</a>
+        <a href="#" class="list-group-item list-group-item-action disabled" target="_blank">HTML5</a>
+        <a href="#" class="list-group-item list-group-item-action disabled" target="_blank">CSS</a>
+        <a href="#" class="list-group-item list-group-item-action disabled" target="_blank">JS</a>
       </div>
   </aside>
-  <article class="col-12 col-md-9">
-    <div class="alert alert-success" role="alert">
-      <h4 class="alert-heading">Проект блог социальная сеть PyBlog</h4>
-      <p>В этом блоге можно создавать посты, делиться фотографиями и ионформацией в нужных вам группах.
-      На данный момент реализована возможность создать запись, отредактировать ее, и размесить на сайте.
-      Так ж реализована возможность регистрации пользователей, востановвления паролей (отправка на почту не реальзована).
-      Система учета доступа пользователей. Для редактирования записей реализовали CKEditor, это удобно.
-      Это только начал опути, по мере развития проекта, инфомрация о новых возможнастях будет публикаваться в этом разделе.
-      </p>
-      <hr>
-      <p class="mb-0">Все вопросы, а так же подробная информация и контактные данные можно найти в разделе "Об авторе"</p>
-    </div>
+
+  <article class="col-12 col-md-9 shadow-lg p-2 mb-2 rounded bg-light">
+    <div class="card p-2 mb-2 rounded bg-light shadow-lg">
+      <div class="card-body">
+        <div class="row">
+              <h4 class="alert-heading">Проект блог социальная сеть PyBlog</h4>
+              <p align="justify">В этом блоге можно создавать посты, подписываться на других авторов, комментировать записи, делиться фотографиями и информацией в нужных вам группах.
+              На данный момент реализована возможность создать и удалить запись, отредактировать ее, и разместить на сайте.
+              Также реализована возможность регистрации пользователей, восстановления паролей (отправка на почту не реализована).
+              Система учета доступа пользователей. Для редактирования записей реализовали редактор CKEditor, это удобно.
+              Это только начало пути, по мере развития проекта, информация о новых возможностях будет публиковаться в этом разделе.
+              </p>
+              <hr>
+              <p class="mb-0">Все вопросы, а также подробная информация и контактные данные можно найти в разделе "Об авторе"</p>
+        </div>
+      </div>
+    </div>  
   </article>
 </div>
 {% endblock %}
-
-<ul>
-<li>
-  HTML, CSS, JavaScript, Bootstrap, <strong>SQL</strong>, Redis
-</li>
-<li>
-  <strong>Python</strong>, Kotlin, Golang
-</li>
-<li>
-  <strong>Django</strong>, <strong>Django Rest Framework</strong>, Flask
-</li>
-<li>
-  <strong>Алгоритмы и структуры данных</strong>
-</li>
-<li>
-  <strong>Docker</strong>
-</li>
-</ul>

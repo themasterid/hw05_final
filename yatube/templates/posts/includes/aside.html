@@ -3,7 +3,7 @@
 <aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
     <ul class="list-group list-group-flush">
         <li class="list-group-item shadow-lg p-2 mb-2 bg-white">
-            {% thumbnail profile.avatar "x150" crop="center" as small %}
+            {% thumbnail profile.avatar "800x800" crop="center" upscale=True as small %}
                 <img class="img-fluid img-thumbnail mx-auto card-img" src="{{ small.url }}">
             {% empty %}
             <div class="col-md-12">
@@ -31,7 +31,13 @@
             </strong>
         </li>
         <li class="list-group-item">
-            Всего постов автора: {{ post.author.posts.count }}
+            Всего постов автора: <strong>{{ post.author.posts.count }}</strong>
+        </li>
+        <li class="list-group-item">
+        <p class="card-text">Подписчики: <strong>{{ post.author.following.count }}</strong></p>
+        </li>
+        <li class="list-group-item">
+        <p class="card-text">Подписан: <strong>{{ post.author.follower.count }}</strong></p>
         </li>
         {% if user.is_authenticated %}
             {% if request.user == post.author %}

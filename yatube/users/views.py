@@ -27,7 +27,7 @@ def update_profile(request):
         user_form.save()
         profile_form.save()
         print('Ваш профиль был успешно обновлен!')
-        return redirect('posts:user_profile', request.user)
+        return redirect('posts:profile', request.user)
     else:
         print('Пожалуйста, исправьте ошибки.')
 
