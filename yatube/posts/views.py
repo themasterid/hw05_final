@@ -13,6 +13,13 @@ from .models import Follow, Group, Post
 User = get_user_model()
 
 
+def get_aside():
+    all_posts = Post.objects.all()[:5]
+    groups = Group.objects.all()
+    users = User.objects.all().order_by('id')[:5]
+    return all_posts, groups, users
+
+
 def get_paginator(request, req):
     paginator = Paginator(
         req,
@@ -25,9 +32,17 @@ def get_paginator(request, req):
 # @cache_page(20, key_prefix='index_page')
 def index(request):
     posts = Post.objects.select_related('author', 'group')
+    all_posts, groups, users = get_aside()
     page_obj = get_paginator(request, posts)
     return render(
-        request, 'posts/index.html', {'page_obj': page_obj})
+        request,
+        'posts/index.html',
+        {
+            'all_posts': all_posts,
+            'users': users,
+            'groups': groups,
+            'page_obj': page_obj}
+    )
 
 
 def group_posts(request, slug):
@@ -133,10 +148,14 @@ def post_delete(request, post_id):
 def follow_index(request):
     posts = Post.objects.filter(
         author__following__user=request.user)
-    paginator = Paginator(posts, settings.NUMBER_POST)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {'page_obj': page_obj}
+    all_posts, groups, users = get_aside()
+    page_obj = get_paginator(request, posts)
+    context = {
+        'all_posts': all_posts,
+        'users': users,
+        'groups': groups,
+        'page_obj': page_obj
+    }
     return render(request, 'posts/follow.html', context)
 
 

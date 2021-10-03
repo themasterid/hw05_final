@@ -1,0 +1,39 @@
+<aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+        <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Искать (не работает)" aria-label="Search">
+        <button class="btn btn-outline-primary my-2" type="submit">Поиск</button>
+        </form>
+        </li>
+        <li class="list-group-item">
+        <strong>Последние посты</strong>
+        </li>
+        {% for post in all_posts %}
+        <li class="list-group-item">
+        <a href="{% url 'posts:post_detail' post.id %}" class="link-light text-decoration-none" style="color: black;">
+        {{ post.title|truncatewords:4 }}
+        </a>
+        </li>
+        {% endfor %}
+        <li class="list-group-item">
+        <strong>Все группы</strong>
+        </li>
+        {% for name in groups %}
+        <li class="list-group-item">
+        <a href="{% url 'posts:group_list' name.slug %}" class="link-light text-decoration-none" style="color: black;">{{ name }}</a>
+        </a>
+        </li>
+        {% endfor %}
+        <li class="list-group-item">
+        <strong>ТОП-5 авторов</strong>
+        </li>
+        {% for user in users %}
+        <li class="list-group-item">
+        <a href="{% url 'posts:profile' user %}" class="link-light text-decoration-none" style="color: black;">
+        {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}
+        </a>
+        </li>
+        {% endfor %}
+    </ul>
+</aside>

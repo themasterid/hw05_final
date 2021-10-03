@@ -2,6 +2,9 @@
 {% block title %}Подписки{% endblock %}
 {% block content %}
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
+{% include 'posts/includes/aside_list.html' %}
+<article class="col-12 col-md-9">
+<div class="row shadow-lg p-2 mb-2 bg-white rounded">
   {% include 'posts/includes/switcher.html' with follow=True %}
   {% for post in page_obj %}
     {% include 'posts/includes/ul_posts.html' %}
@@ -15,5 +18,7 @@
     {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}
   {% include 'posts/includes/paginator.html' %}
+</div>
+</article>
 </div>
 {% endblock %}

@@ -22,6 +22,6 @@ class ProfileAdmin(admin.ModelAdmin):
 
     def get_image(self, obj):
         return mark_safe(
-            f'<img src={obj.avatar.url} width="20%"')
+            f'<img src={obj.avatar} width="20%"')
 
     get_image.short_description = 'Аватар'

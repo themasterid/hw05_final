@@ -14,6 +14,7 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
@@ -134,10 +135,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 INTERNAL_IPS = ('127.0.0.1', '192.168.0.1',)
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
+CKEDITOR_IMAGE_BACKEND = 'pillow'
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'skin': 'moono',
+        # 'skin': 'moono',
         # 'skin': 'office2013',
         'toolbar_Basic': [
             ['Source', '-', 'Bold', 'Italic']

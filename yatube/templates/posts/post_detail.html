@@ -46,6 +46,12 @@
       </div>
     </div>
 
+      {% if not user.is_authenticated %}
+          <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
+            <a href="{% url 'users:login' %}">Войдите</a> или <a href="{% url 'users:signup' %}">Зарегистрируйтесь</a>
+          </div>
+      {% endif %}
+
       {% load user_filters %}
       {% if comments.count != 0 %}
       {% with comments.count as total_comments %}
