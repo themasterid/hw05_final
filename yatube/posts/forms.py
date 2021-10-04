@@ -36,3 +36,10 @@ class EmailPostForm(forms.Form):
         widget=forms.Textarea,
         label="Сообщение",
         help_text="Текст сообщения")
+
+
+class SearchPostForm(forms.Form):
+    text = forms.CharField(
+        max_length=25,
+        label="Поиск",
+        help_text="Поиск")

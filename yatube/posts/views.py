@@ -11,7 +11,7 @@ from django.views.generic import ListView
 # from django.views.decorators.cache import cache_page
 from users.models import Profile
 
-from .forms import CommentForm, EmailPostForm, PostForm
+from .forms import CommentForm, EmailPostForm, PostForm, SearchPostForm
 from .models import Follow, Group, Post
 
 User = get_user_model()
@@ -24,8 +24,7 @@ class SearchResultsView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         return Post.objects.filter(
-            Q(text__icontains=query) | Q(title__icontains=query)
-        )
+            Q(text__icontains=query) | Q(title__icontains=query))
 
 
 def get_aside():
