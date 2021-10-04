@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 secret_settings.txt
 yatube/yatube_cache/
+yatube/yatube/secret_email.py
 _db.sqlite3
 # C extensions
 *.so

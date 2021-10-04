@@ -8,15 +8,19 @@
     {% endthumbnail %}
     <div class="card-body">
         <h4 class="card-title p-1 mb-1 bg-white rounded">
-        | <a href="{% url 'posts:post_detail' post.id %}" class="link-light text-decoration-none" style="color: black;">
+        <a href="{% url 'posts:post_detail' post.id %}" class="link-light text-decoration-none" style="color: black;">
         {{ post.title }}
-        </a> | 
+        </a>
+        | <a href="{% url "posts:post_share" post.id %}" class="link-light text-decoration-none">
+        <img src="{% static 'img/send_email.png' %}" width='24px;' height='24px;' alt="Поделиться постом"
+        data-toggle="tooltip" data-placement="top" title="Поделиться постом">
+        </a> |
         {% if request.user == post.author %}
         <a href="{% url 'posts:edit' post.id %}" class="link-light text-decoration-none">
-        <img src="{% static 'img/edit_btn.gif' %}" width='24px;' height='24px;'>
+        <img src="{% static 'img/edit_btn.gif' %}" width='24px;' height='24px;' data-toggle="tooltip" data-placement="top" title="Редактировать пост">
         </a> |
         <a href="{% url 'posts:edit' post.id %}" class="link-light text-decoration-none"  data-toggle="modal" data-target="#exampleModalCenter">
-        <img src="{% static 'img/delete_btn.gif' %}" width='24px;' height='24px;'>
+        <img src="{% static 'img/delete_btn.gif' %}" width='24px;' height='24px;' data-toggle="tooltip" data-placement="top" title="Удалить пост">
         </a> |
         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">

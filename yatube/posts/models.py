@@ -67,6 +67,9 @@ class Post(models.Model):
         blank=True,
         help_text='Картинка в шапку поста'
     )
+    status = models.BooleanField(
+        default=True,
+        verbose_name='Опубликован')
 
     class Meta:
         ordering = ['-pub_date']
@@ -74,7 +77,7 @@ class Post(models.Model):
         verbose_name = 'Пост'
 
     def __str__(self):
-        return self.text[:15]
+        return self.title[:15]
 
 
 class Comment(models.Model):

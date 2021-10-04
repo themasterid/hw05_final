@@ -1,0 +1,47 @@
+
+{% extends "base.html" %}
+{% block title %}Поиск{% endblock %}
+{% block content %}
+
+<div class="row p-2 mb-2 shadow-lg rounded bg-light">
+  
+  <div class="card p-2 mb-2">
+    <div class="card-body">
+        <h1 class="card-title">Результат поиска</h1>
+
+            <form action="{% url 'posts:search_results' %}" method="get">
+                <input name="q" type="text" placeholder="Искать (не работает)" aria-label="Search">
+                <button type="submit">Поиск</button>
+            </form>
+
+    </div>
+  </div>
+
+
+
+  <aside class="col-12 col-md-3 p-1">
+      <div class="list-group">
+        <a href="https://www.python.org/downloads/" class="list-group-item list-group-item-action" target="_blank">Python</a>
+        <a href="https://www.djangoproject.com/" class="list-group-item list-group-item-action" target="_blank">Django</a>
+        <a href="https://getbootstrap.com/" class="list-group-item list-group-item-action" target="_blank">Bootstrap 4</a>
+        <a href="https://django-ckeditor.readthedocs.io/en/latest/" class="list-group-item list-group-item-action" target="_blank">CKEditor</a>
+        <a href="#" class="list-group-item list-group-item-action disabled" target="_blank">HTML5</a>
+        <a href="#" class="list-group-item list-group-item-action disabled" target="_blank">CSS</a>
+        <a href="#" class="list-group-item list-group-item-action disabled" target="_blank">JS</a>
+      </div>
+  </aside>
+
+  <article class="col-12 col-md-9 p-1 mb-1">
+    <div class="card shadow-lg p-1 mb-1 rounded bg-light">
+      <div class="card-body">
+        <div class="row">
+            {% for post in object_list %}
+                <h4 class="card-title">{{ post.title|safe|linebreaks }}</h4>
+                <!-- <p class="card-text">{{ post.text|safe|linebreaks|truncatewords:40 }}</p> -->
+            {% endfor %}
+        </div>
+      </div>
+    </div>  
+  </article>
+</div>
+{% endblock %}

@@ -1,10 +1,10 @@
 <aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
-        <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Искать (не работает)" aria-label="Search">
-        <button class="btn btn-outline-primary my-2" type="submit">Поиск</button>
-        </form>
+            <form class="form-inline my-2 my-lg-0" action="{% url 'posts:search_results' %}" method="get">
+                <input class="form-control mr-sm-2" name="q" type="text" placeholder="Искать (не работает)" aria-label="Search">
+                <button class="btn btn-outline-primary my-2" type="submit">Поиск</button>
+            </form>
         </li>
         <li class="list-group-item">
         <strong>Последние посты</strong>

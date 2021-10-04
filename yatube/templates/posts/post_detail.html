@@ -3,6 +3,7 @@
 {% load thumbnail %}
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
+
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
   {% include 'posts/includes/aside.html' %}
   <article class="col-12 col-md-9">
@@ -12,14 +13,18 @@
       {% endthumbnail %}
       <div class="card-body">
         <h4 class="card-title">
-        | {{ post.title }} | 
+        {{ post.title }} 
+        | <a href="{% url "posts:post_share" post.id %}" class="link-light text-decoration-none">
+        <img src="{% static 'img/send_email.png' %}" width='24px;' height='24px;' alt="Поделиться постом"
+        data-toggle="tooltip" data-placement="top" title="Поделиться постом">
+        </a> |
         {% if post.author == requser %}
         <a href="{% url 'posts:edit' post.id %}" class="link-light text-decoration-none">
-        <img src="{% static 'img/edit_btn.gif' %}" width='24px;' height='24px;'>
+        <img src="{% static 'img/edit_btn.gif' %}" width='24px;' height='24px;' data-toggle="tooltip" data-placement="top" title="Редактировать пост">
         </a> |
         <a href="{% url 'posts:edit' post.id %}" class="link-light text-decoration-none"  data-toggle="modal" data-target="#exampleModalCenter">
-        <img src="{% static 'img/delete_btn.gif' %}" width='24px;' height='24px;'>
-        </a>
+        <img src="{% static 'img/delete_btn.gif' %}" width='24px;' height='24px;' data-toggle="tooltip" data-placement="top" title="Удалить пост">
+        </a> |
         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -43,14 +48,16 @@
         </h4>
         <hr>
         <p class="card-text">{{ post.text|safe|linebreaks }}</p>
+        {% if not user.is_authenticated %}
+        <hr>
+        <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
+            <a href="{% url 'users:login' %}" 
+            data-toggle="tooltip" data-placement="top" title="Войдите">Войдите</a> или <a href="{% url 'users:signup' %}"
+            data-toggle="tooltip" data-placement="top" title="Зарегистрируйтесь">Зарегистрируйтесь</a>
+        </div>
+        {% endif %}
       </div>
     </div>
-
-      {% if not user.is_authenticated %}
-          <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
-            <a href="{% url 'users:login' %}">Войдите</a> или <a href="{% url 'users:signup' %}">Зарегистрируйтесь</a>
-          </div>
-      {% endif %}
 
       {% load user_filters %}
       {% if comments.count != 0 %}
