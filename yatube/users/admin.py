@@ -17,11 +17,13 @@ class ProfileAdmin(admin.ModelAdmin):
     # list_editable = ('bio',)
     search_fields = ('location',)
     list_filter = ('birth_date',)
-    readonly_fields = ('get_image', )
     empty_value_display = '-пусто-'
+    readonly_fields = ('get_image', )
 
     def get_image(self, obj):
+        if obj.avatar == '':
+            obj.avatar = 'avatars/no_photo.png'
         return mark_safe(
-            f'<img src={obj.avatar} width="20%"')
+            f'<img src={obj.avatar.url} width="20%"')
 
     get_image.short_description = 'Аватар'

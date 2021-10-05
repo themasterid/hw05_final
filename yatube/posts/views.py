@@ -11,8 +11,8 @@ from django.views.generic import ListView
 # from django.views.decorators.cache import cache_page
 from users.models import Profile
 
-from .forms import CommentForm, EmailPostForm, PostForm, SearchPostForm
-from .models import Follow, Group, Post
+from .forms import CommentForm, EmailPostForm, PostForm
+from .models import Comment, Follow, Group, Post
 
 User = get_user_model()
 
@@ -117,6 +117,13 @@ def add_comment(request, post_id):
 
 
 @login_required
+def delete_comment(request, post_id, comment_id):
+    comment = Comment.objects.filter(pk=comment_id)
+    comment.delete()
+    return redirect('posts:post_detail', post_id)
+
+
+@login_required
 def post_create(request):
     form = PostForm(
         request.POST or None,
@@ -183,13 +190,12 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    user_follower = get_object_or_404(
-        Follow,
-        user=request.user,
-        author__username=username
-    )
-    user_follower.delete()
-    return redirect('posts:profile', username)
+    author = get_object_or_404(User, username=username)
+    profile_follow = Follow.objects.filter(
+        user=request.user, author=author).select_related('user')
+    if profile_follow.exists():
+        profile_follow.delete()
+    return redirect('posts:profile', username=username)
 
 
 @login_required

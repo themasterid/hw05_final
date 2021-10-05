@@ -80,7 +80,14 @@
           </div>
           <div class="col">
             <div class="card-body mw-100 rounded bg-light">
-              <a href="{% url 'posts:profile' comment.author.username %}"><h5 class="card-title">{{ comment.author.get_full_name }}</h5></a>
+              <h4 class="card-title">
+              <a href="{% url 'posts:profile' comment.author.username %}">{{ comment.author.get_full_name }}</a>
+              {% if comment.author == request.user %}
+              <a href="{% url 'posts:delete_comment' post.id comment.id %}" class="link-light text-decoration-none">
+              <img src="{% static 'img/delete_btn.gif' %}" width='24px;' height='24px;' data-toggle="tooltip" data-placement="top" title="Удалить комментарий">
+              </a>
+              {% endif %}
+              </h4>
               <p class="card-text">{{ comment.text|safe|linebreaks }}</p>
               <p class="card-text"><small class="text-muted">{{ comment.created|date:'d E Y' }}</small></p>
             </div>

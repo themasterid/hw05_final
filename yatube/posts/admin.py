@@ -14,13 +14,14 @@ class PostAdmin(admin.ModelAdmin):
         'group',
         'get_image',
     )
-    readonly_fields = ('get_image', )
-    # list_editable = ('group',)
     search_fields = ('text',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
+    readonly_fields = ('get_image', )
 
     def get_image(self, obj):
+        if obj.image == '':
+            obj.image = 'posts/no_photo.png'
         return mark_safe(
             f'<img src={obj.image.url} width="20%"')
 
