@@ -150,6 +150,7 @@ def post_create(request):
         create_post = form.save(commit=False)
         create_post.author = request.user
         create_post.save()
+        cache.clear()
         return redirect('posts:profile', create_post.author)
     template = 'posts/create_post.html'
     context = {
@@ -174,6 +175,7 @@ def post_edit(request, post_id):
         instance=post)
     if form.is_valid():
         form.save()
+        cache.clear()
         return redirect('posts:post_detail', post_id)
     template = 'posts/create_post.html'
     context = {

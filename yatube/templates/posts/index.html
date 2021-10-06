@@ -12,7 +12,7 @@
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
   {% include 'posts/includes/switcher.html' with index=True %}
   {% load cache %}
-  {% cache 1 index_page page_obj %}
+  {% cache 300 index_page page_obj %}
   {% for post in page_obj %}
     {% include 'posts/includes/ul_posts.html' %}
     {% include 'posts/includes/post_block.html' %}
