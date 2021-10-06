@@ -1,39 +1,54 @@
-<aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-            <form class="form-inline my-2 my-lg-0" action="{% url 'posts:search_results' %}" method="get">
-                <input class="form-control mr-sm-2" name="q" type="text" placeholder="Искать (не работает)" aria-label="Search">
-                <button class="btn btn-outline-primary my-2" type="submit">Поиск</button>
-            </form>
-        </li>
-        <li class="list-group-item">
-        <strong>Последние посты</strong>
-        </li>
-        {% for post in all_posts %}
-        <li class="list-group-item">
-        <a href="{% url 'posts:post_detail' post.id %}" class="link-light text-decoration-none" style="color: black;">
-        {{ post.title|truncatewords:4 }}
+{% load static %}
+{% load thumbnail %}
+<div class="alert alert-info" role="alert">
+    <strong>Последние посты</strong>
+</div>
+{% for post in all_posts %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+        <a href="{% url 'posts:post_detail' post.id %}" class="link-light text-decoration-none" style="color: black;"
+        data-toggle="tooltip" data-placement="top"
+        title="Посмотреть запись">
+        <strong>{{ post.title|truncatewords:5 }}</strong>
         </a>
-        </li>
-        {% endfor %}
-        <li class="list-group-item">
-        <strong>Все группы</strong>
-        </li>
-        {% for name in groups %}
-        <li class="list-group-item">
-        <a href="{% url 'posts:group_list' name.slug %}" class="link-light text-decoration-none" style="color: black;">{{ name }}</a>
+    </div>
+{% endfor %}
+<div class="alert alert-info" role="alert">
+<strong>Последние комментарии</strong>
+</div>
+{% for comment in comments %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+        <a href="{% url 'posts:post_detail' comment.post.id %}" class="link-light text-decoration-none" style="color: black;"
+        data-toggle="tooltip" data-placement="top"
+        title="Посмотреть комментарий">
+        <strong>{{ comment.text|safe|truncatewords:10 }}</strong>
         </a>
-        </li>
-        {% endfor %}
-        <li class="list-group-item">
-        <strong>ТОП-5 авторов</strong>
-        </li>
-        {% for user in users %}
-        <li class="list-group-item">
-        <a href="{% url 'posts:profile' user %}" class="link-light text-decoration-none" style="color: black;">
-        {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}
-        </a>
-        </li>
-        {% endfor %}
-    </ul>
-</aside>
+        <p style="font-size: 12px;">{{ comment.updated|date:'d E Y' }}</p>
+    </div>
+{% endfor %}
+<div class="alert alert-info" role="alert">
+<strong>Все группы</strong>
+</div>
+{% for name in groups %}
+<div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+    <strong>
+    <a href="{% url 'posts:group_list' name.slug %}" class="link-light text-decoration-none" style="color: black;"
+    data-toggle="tooltip" data-placement="top"
+    title="Посмотреть группу {{ name }}">
+    {{ name }}
+    </a>
+    </strong>
+    {{ name.description|linebreaks }}
+</div>
+{% endfor %}
+<div class="alert alert-info" role="alert">
+<strong>ТОП-5 авторов</strong>
+</div>
+{% for user in users %}
+<div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+<a href="{% url 'posts:profile' user %}" class="link-light text-decoration-none" style="color: black;"
+data-toggle="tooltip" data-placement="top"
+title="Посмотреть профиль {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}">
+<strong>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user }}{% endif %}</strong>
+</a>
+</div>
+{% endfor %}

@@ -12,67 +12,10 @@
 {% block content %}
 
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
-    <div class="card" style="width: 100%">
-        <div class="card-body">
-            <h3 class="card-title">Профиль пользователя: {% if author.get_full_name %}{{ author.get_full_name }}{% else %}{{ author }}{% endif %}</h3>
-            <h5 class="card-title">
-                Публикаций: <strong>{{ page_obj.paginator.count }}</strong>
-                Подписчиков: <strong>{{ author.following.count }}</strong>
-                Подписок: <strong>{{ author.follower.count }}</strong>
-            </h5>
-        </div>
-    </div>
 
-<aside class="col-12 col-md-3">
-    <ul class="list-group list-group-flush">
-        {% if user.is_authenticated %}
-            {% if request.user != author %}
-            <li class="list-group-item text-center">
-                {% if following %}
-                    <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'posts:profile_unfollow' author.username %}" role="button">Отписаться</a>
-                {% else %}
-                    <a class="btn btn-lg btn-outline-success btn-sm" href="{% url 'posts:profile_follow' author.username %}" role="button">Подписаться</a>
-                {% endif %}
-            </li>
-            {% endif %}
-        {% endif %}
-        <li class="list-group-item">
-            {% thumbnail profile.avatar "800x800" crop="center" upscale=True as small %}
-                <img class="img-fluid img-thumbnail mx-auto card-img" class="rounded" src="{{ small.url }}">
-            {% empty %}
-                <div class="col-md-12">
-                    <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
-                </div>
-            {% endthumbnail %}
-        </li>
-        <li class="list-group-item">
-        Полное имя: <strong>{% if author.get_full_name %}{{ author.get_full_name }}{% else %}{{ author }}{% endif %}</strong>
-        </li>
-        {% if author.profile.location %}
-        <li class="list-group-item">
-        Проживание: <strong>{{ author.profile.location }}</strong>
-        </li>
-        {% endif %}
-        {% if profile.bio %}
-        <li class="list-group-item">
-        О себе: {{ profile.bio }}
-        </li>
-        {% endif %}
-        {% if author.profile.birth_date %}
-        <li class="list-group-item">
-        Дата рождения: <strong>{{ author.profile.birth_date }}</strong>
-        </li>
-        {% endif %}
-        <li class="list-group-item">
-        {% if user.is_authenticated %}
-                {% if request.user == author %}
-                    <a href="{% url 'users:update_profile' %}" class="link-light text-decoration-none" style="color: black;">
-                    <strong>Редактировать профиль</strong>
-                    </a>
-                {% endif %}
-        {% endif %}    
-        </li>
-    </ul>
+<aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
+{% include 'posts/includes/aside.html' %} 
+{% include 'posts/includes/aside_list.html' %}
 </aside>
 
 <article class="col-12 col-md-9">
@@ -91,6 +34,7 @@
             {% if post.group %}
             <a href="{% url 'posts:group_list' post.group.slug %}"><button type="button" class="btn btn-outline-primary btn-sm">Все записи группы {{ post.group }}</button></a>
             {% endif %}
+            <a href="{% url 'posts:post_detail' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Комментариев: <strong>{{ post.comments.count }}</strong></button></a>
         </div>
         {% if not forloop.last %}{% endif %}
     {% endfor %}

@@ -1,52 +1,108 @@
 {% load static %}
 {% load thumbnail %}
-<aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item shadow-lg p-2 mb-2 bg-white">
-            {% thumbnail profile.avatar "800x800" crop="center" upscale=True as small %}
-                <img class="img-fluid img-thumbnail mx-auto card-img" src="{{ small.url }}">
-            {% empty %}
-            <div class="col-md-12">
-                <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
-            </div>
-            {% endthumbnail %}
-        </li>
-        <li class="list-group-item">
-            Дата публикации: <strong>{{ post.pub_date|date:'d E Y' }}</strong>
-        </li>
-            {% if post.group %}
-            <li class="list-group-item">
-            Группа: <strong>
-            <a href="{% url 'posts:group_list' post.group.slug %}" class="link-light text-decoration-none" style="color: black;">
-            {{ post.group }}
-            </a>
-            </strong>
-            </li>
-            {% endif %}
-        <li class="list-group-item">
-            Автор: <strong>
-            <a href="{% url 'posts:profile' post.author %}" class="link-light text-decoration-none" style="color: black;">
-            {% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}
-            </a>
-            </strong>
-        </li>
-        <li class="list-group-item">
-            Всего постов автора: <strong>{{ post.author.posts.count }}</strong>
-        </li>
-        <li class="list-group-item">
-        <p class="card-text">Подписчики: <strong>{{ post.author.following.count }}</strong></p>
-        </li>
-        <li class="list-group-item">
-        <p class="card-text">Подписан: <strong>{{ post.author.follower.count }}</strong></p>
-        </li>
-        {% if user.is_authenticated %}
-            {% if request.user == post.author %}
-                <li class="list-group-item">
-                    <a href="{% url 'users:update_profile' %}" class="link-light text-decoration-none" style="color: black;">
-                    Редактировать профиль
-                    </a>
-                </li>
-            {% endif %}
+
+{% if request.user.is_authenticated %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+    {% with request.resolver_match.view_name as view_name %}
+    {% if view_name == 'index:index' or view_name == 'index:follow_index' or view_name == 'index:create' or view_name == 'index:edit' %}
+        {% thumbnail request.user.profile.avatar "800x800" crop="center" upscale=True as small %}
+            <img class="img-fluid img-thumbnail mx-auto card-img" src="{{ small.url }}">
+        {% empty %}
+        <div class="col-md-12">
+            <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
+        </div>
+        {% endthumbnail %}
+    {% else %}
+        {% thumbnail author.profile.avatar "800x800" crop="center" upscale=True as small %}
+            <img class="img-fluid img-thumbnail mx-auto card-img" src="{{ small.url }}">
+        {% empty %}
+        <div class="col-md-12">
+            <img class="img-fluid img-thumbnail mx-auto card-img" src="{% static 'img/no_img.png' %}" alt="нет фото">
+        </div>
+        {% endthumbnail %}
+    {% endif %}
+
+    </div>
+    {% if request.user != author and author %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+        {% if following %}
+            <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'posts:profile_unfollow' author.username %}" role="button">Отписаться</a>
+        {% else %}
+            <a class="btn btn-lg btn-outline-success btn-sm" href="{% url 'posts:profile_follow' author.username %}" role="button">Подписаться</a>
         {% endif %}
-    </ul>
-</aside>
+    </div>
+    {% endif %}
+
+    {% if view_name == 'index:index' or view_name == 'index:follow_index' or view_name == 'index:create' or view_name == 'index:edit' or view_name == 'index:profile' or view_name == 'index:post_detail' %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+        <select class="form-select" aria-label="Default select example" onchange="location = this.value;">
+            <option selected>Изменить профиль/пароль</option>
+            <option value="{% url 'users:update_profile' %}">Изменить профиль</option>
+            <option value="{% url 'users:password_change' %}">Изменить пароль</option>
+        </select>
+    </div>
+    {% endif %}
+    {% if view_name == 'index:index' or view_name == 'index:follow_index' or view_name == 'index:create' or view_name == 'index:edit' %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+    <div class="accordion" id="accordionAside">
+        <div class="card">
+            <button class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            Активность
+            </button>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionAside">
+                <div class="card-body">
+                Всего записей: <strong>{{ request.user.posts.count }}</strong><hr>
+                Всего комментариев: <strong>{{ request.user.comments.count }}</strong><hr>
+                Подписчики: <strong>{{ request.user.following.count }}</strong><hr>
+                Подписан: <strong>{{ request.user.follower.count }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <button class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            О себе
+            </button>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionAside">
+                <div class="card-body">
+                Полное имя: <strong>{% if request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}{{ request.user }}{% endif %}</strong><hr>
+                Проживание: <strong>{{ request.user.profile.location }}</strong><hr>
+                О себе: {{ request.user.profile.bio }}<hr>
+                Дата рождения: <strong>{{ request.user.profile.birth_date }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+    <div class="accordion" id="accordionAside">
+        <div class="card">
+            <button class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            Активность
+            </button>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionAside">
+                <div class="card-body">
+                Всего записей: <strong>{{ author.posts.count }}</strong><hr>
+                Всего комментариев: <strong>{{ author.comments.count }}</strong><hr>
+                Подписчики: <strong>{{ author.following.count }}</strong><hr>
+                Подписан: <strong>{{ author.follower.count }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <button class="btn btn-outline-success" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            О себе
+            </button>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionAside">
+                <div class="card-body">
+                Полное имя: <strong>{% if author.get_full_name %}{{ author.get_full_name }}{% else %}{{ author }}{% endif %}</strong><hr>
+                Проживание: <strong>{{ author.profile.location }}</strong><hr>
+                О себе: {{ author.profile.bio }}<hr>
+                Дата рождения: <strong>{{ author.profile.birth_date }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    </div>
+{% endif %}

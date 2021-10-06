@@ -2,7 +2,10 @@
 {% block title %}Подписки{% endblock %}
 {% block content %}
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
+<aside class="col-12 col-md-3 shadow-lg p-2 mb-2 bg-white rounded">
+{% include 'posts/includes/aside.html' %} 
 {% include 'posts/includes/aside_list.html' %}
+</aside>
 <article class="col-12 col-md-9">
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
   {% include 'posts/includes/switcher.html' with follow=True %}
@@ -14,6 +17,7 @@
             {% if post.group %}
             <a href="{% url 'posts:group_list' post.group.slug %}"><button type="button" class="btn btn-outline-primary btn-sm">Все записи группы {{ post.group }}</button></a>
             {% endif %}
+            <a href="{% url 'posts:post_detail' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Комментариев: <strong>{{ post.comments.count }}</strong></button></a>
         </div>
     {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}

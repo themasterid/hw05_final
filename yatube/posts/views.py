@@ -6,9 +6,7 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.views.generic import ListView
-# from django.views.decorators.cache import cache_page
 from users.models import Profile
 
 from .forms import CommentForm, EmailPostForm, PostForm
@@ -20,6 +18,7 @@ User = get_user_model()
 class SearchResultsView(ListView):
     model = Post
     template_name = 'posts/search_results.html'
+    paginate_by = settings.NUMBER_POST
 
     def get_queryset(self):
         query = self.request.GET.get('q')
@@ -28,10 +27,12 @@ class SearchResultsView(ListView):
 
 
 def get_aside():
-    all_posts = Post.objects.all()[:5]
-    groups = Group.objects.all()
-    users = User.objects.all().order_by('id')[:5]
-    return all_posts, groups, users
+    all_posts = Post.objects.all()[:settings.NUMBER_POST]
+    groups = Group.objects.all()[:settings.NUMBER_POST]
+    users = User.objects.all().order_by('id')[:settings.NUMBER_POST]
+    comments = Comment.objects.all().select_related(
+        'post')[:settings.NUMBER_POST]
+    return all_posts, groups, users, comments
 
 
 def get_paginator(request, req):
@@ -43,20 +44,17 @@ def get_paginator(request, req):
     return paginator.get_page(page_number)
 
 
-# @cache_page(20, key_prefix='index_page')
 def index(request):
-    posts = Post.objects.select_related('author', 'group')
-    all_posts, groups, users = get_aside()
-    page_obj = get_paginator(request, posts)
-    return render(
-        request,
-        'posts/index.html',
-        {
-            'all_posts': all_posts,
-            'users': users,
-            'groups': groups,
-            'page_obj': page_obj}
-    )
+    post = Post.objects.select_related('author', 'group')
+    page_obj = get_paginator(request, post)
+    all_posts, groups, users, comments = get_aside()
+    context = {
+        'page_obj': page_obj,
+        'all_posts': all_posts,
+        'groups': groups,
+        'users': users,
+        'comments': comments}
+    return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
@@ -78,11 +76,16 @@ def profile(request, username):
     following = request.user.is_authenticated
     if following:
         following = author.following.filter(user=request.user).exists()
+    all_posts, groups, users, comments = get_aside()
     context = {
         'page_obj': page_obj,
         'author': author,
         'following': following,
         'profile': profile,
+        'all_posts': all_posts,
+        'groups': groups,
+        'users': users,
+        'comments': comments
     }
     return render(
         request, 'posts/profile.html', context)
@@ -91,15 +94,21 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     profile = get_object_or_404(Profile, user=post.author)
-    comments = post.comments.all()
+    comments_details = post.comments.all()
     form = CommentForm()
     template = 'posts/post_detail.html'
+    all_posts, groups, users, comments = get_aside()
     context = {
         'post': post,
         'requser': request.user,
-        'comments': comments,
+        'author': post.author,
         'form': form,
         'profile': profile,
+        'all_posts': all_posts,
+        'groups': groups,
+        'users': users,
+        'comments': comments,
+        'comments_details': comments_details
     }
     return render(request, template, context)
 
@@ -125,6 +134,7 @@ def delete_comment(request, post_id, comment_id):
 
 @login_required
 def post_create(request):
+    all_posts, groups, users, comments = get_aside()
     form = PostForm(
         request.POST or None,
         files=request.FILES or None)
@@ -134,7 +144,13 @@ def post_create(request):
         create_post.save()
         return redirect('posts:profile', create_post.author)
     template = 'posts/create_post.html'
-    context = {'form': form}
+    context = {
+        'form': form,
+        'comments': comments,
+        'all_posts': all_posts,
+        'users': users,
+        'groups': groups,
+        }
     return render(request, template, context)
 
 
@@ -143,6 +159,7 @@ def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
         return redirect('posts:post_detail', post_id)
+    all_posts, groups, users, comments = get_aside()
     form = PostForm(
         request.POST or None,
         files=request.FILES or None,
@@ -151,7 +168,15 @@ def post_edit(request, post_id):
         form.save()
         return redirect('posts:post_detail', post_id)
     template = 'posts/create_post.html'
-    context = {'form': form, 'post': post, 'is_edit': True}
+    context = {
+        'form': form,
+        'post': post,
+        'is_edit': True,
+        'comments': comments,
+        'all_posts': all_posts,
+        'users': users,
+        'groups': groups,
+        }
     return render(request, template, context)
 
 
@@ -169,13 +194,14 @@ def post_delete(request, post_id):
 def follow_index(request):
     posts = Post.objects.filter(
         author__following__user=request.user)
-    all_posts, groups, users = get_aside()
     page_obj = get_paginator(request, posts)
+    all_posts, groups, users, comments = get_aside()
     context = {
         'all_posts': all_posts,
         'users': users,
         'groups': groups,
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'comments': comments
     }
     return render(request, 'posts/follow.html', context)
 

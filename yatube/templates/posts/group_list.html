@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Записи сообщества: {{ group.title }}{% endblock %}
 {% block content %}
+
 <div class="row shadow-lg p-2 mb-2 bg-white rounded">
   {% include 'posts/includes/switcher.html' %}
   <div class="card bg-light" style="width: 100%">
@@ -14,7 +15,8 @@
   {% include 'posts/includes/post_block.html' %}
 
   <div class="card-body shadow-lg p-2 mb-2 bg-white rounded">
-    <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-light"><button type="button" class="btn btn-outline-primary btn-sm">Подробная информация</button></a> 
+    <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-light"><button type="button" class="btn btn-outline-primary btn-sm">Подробная информация</button></a>
+    <a href="{% url 'posts:post_detail' post.id %}"><button type="button" class="btn btn-outline-primary btn-sm">Комментариев: <strong>{{ post.comments.count }}</strong></button></a> 
   </div>
 
   {% if not forloop.last %}<hr>{% endif %}

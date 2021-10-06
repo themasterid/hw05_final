@@ -29,12 +29,6 @@
       </li>
       {% if user.is_authenticated %}
         <li class="nav-item"> 
-          <a class="nav-link link-light {% if view_name == 'posts:create' %}active{% endif %}" href="{% url 'posts:create' %}">Новая запись</a>
-        </li>
-        <li class="nav-item"> 
-          <a class="nav-link link-light {% if view_name == 'users:password_change' %}active{% endif %}" href="{% url 'users:password_change' %}">Изменить пароль</a>
-        </li>
-        <li class="nav-item"> 
           <a class="nav-link link-light {% if view_name == 'users:logout' %}active{% endif %}" href="{% url 'users:logout' %}">Выйти</a>
         </li>
         <li class="nav-item bg-light rounded">
@@ -57,6 +51,10 @@
       {% endif %}
       {% endwith %}
     </ul>
+    <form class="form-inline ml-auto d-flex justify-content-center md-form form-sm" action="{% url 'posts:search_results' %}" method="get">
+      <input class="form-control form-control mr-1 w-75" name="q" type="text" placeholder="Поиск..." aria-label="Search">
+      <i class="fas fa-search" aria-hidden="true"></i>
+    </form>
     </div>
   </div>
 </nav>
