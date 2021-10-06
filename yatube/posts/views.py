@@ -96,6 +96,10 @@ def post_detail(request, post_id):
     profile = get_object_or_404(Profile, user=post.author)
     comments_details = post.comments.all()
     form = CommentForm()
+    author = get_object_or_404(User, username=post.author)
+    following = request.user.is_authenticated
+    if following:
+        following = author.following.filter(user=request.user).exists()
     template = 'posts/post_detail.html'
     all_posts, groups, users, comments = get_aside()
     context = {
@@ -108,7 +112,8 @@ def post_detail(request, post_id):
         'groups': groups,
         'users': users,
         'comments': comments,
-        'comments_details': comments_details
+        'comments_details': comments_details,
+        'following': following
     }
     return render(request, template, context)
 

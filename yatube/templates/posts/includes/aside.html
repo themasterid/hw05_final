@@ -26,9 +26,9 @@
     {% if request.user != author and author %}
     <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
         {% if following %}
-            <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'posts:profile_unfollow' author.username %}" role="button">Отписаться</a>
+            <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'posts:profile_unfollow' author %}" role="button">Отписаться</a>
         {% else %}
-            <a class="btn btn-lg btn-outline-success btn-sm" href="{% url 'posts:profile_follow' author.username %}" role="button">Подписаться</a>
+            <a class="btn btn-lg btn-outline-success btn-sm" href="{% url 'posts:profile_follow' author %}" role="button">Подписаться</a>
         {% endif %}
     </div>
     {% endif %}
@@ -64,10 +64,10 @@
             </button>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionAside">
                 <div class="card-body">
-                Полное имя: <strong>{% if request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}{{ request.user }}{% endif %}</strong><hr>
-                Проживание: <strong>{{ request.user.profile.location }}</strong><hr>
-                О себе: {{ request.user.profile.bio }}<hr>
-                Дата рождения: <strong>{{ request.user.profile.birth_date }}</strong>
+                Имя: <strong>{% if request.user.get_full_name %}{{ request.user.get_full_name }}<hr>{% else %}{{ request.user }}<hr>{% endif %}</strong>
+                {% if request.user.profile.location %}Проживание: <strong>{{ request.user.profile.location }}</strong><hr>{% endif %}
+                {% if request.user.profile.bio %}О себе: <strong>{{ request.user.profile.bio }}</strong><hr>{% endif %}
+                {% if request.user.profile.birth_date %}Дата рождения: <strong>{{ request.user.profile.birth_date }}</strong>{% endif %}
                 </div>
             </div>
         </div>
@@ -94,10 +94,10 @@
             </button>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionAside">
                 <div class="card-body">
-                Полное имя: <strong>{% if author.get_full_name %}{{ author.get_full_name }}{% else %}{{ author }}{% endif %}</strong><hr>
-                Проживание: <strong>{{ author.profile.location }}</strong><hr>
-                О себе: {{ author.profile.bio }}<hr>
-                Дата рождения: <strong>{{ author.profile.birth_date }}</strong>
+                Имя: <strong>{% if author.get_full_name %}{{ author.get_full_name }}<hr>{% else %}{{ author }}<hr>{% endif %}</strong>
+                {% if author.profile.location %}Проживание: <strong>{{ author.profile.location }}</strong><hr>{% endif %}
+                {% if author.profile.bio %}О себе: <strong>{{ author.profile.bio }}</strong><hr>{% endif %}
+                {% if author.profile.birth_date %}Дата рождения: <strong>{{ author.profile.birth_date }}</strong>{% endif %}
                 </div>
             </div>
         </div>
