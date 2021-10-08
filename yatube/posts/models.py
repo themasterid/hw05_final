@@ -2,6 +2,8 @@ from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 User = get_user_model()
 

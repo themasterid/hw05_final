@@ -24,7 +24,7 @@
 
     </div>
     {% if request.user != author and author %}
-    <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
+    <div class="card shadow-lg p-2 mb-2 rounded">
         {% if following %}
             <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'posts:profile_unfollow' author %}" role="button">Отписаться</a>
         {% else %}
@@ -33,9 +33,22 @@
     </div>
     {% endif %}
 
-    {% if view_name == 'index:index' or view_name == 'index:follow_index' or view_name == 'index:create' or view_name == 'index:edit' or view_name == 'index:profile' or view_name == 'index:post_detail' %}
+    
+    {% if request.user.is_authenticated %}
+    {% if request.user.id == author.id or author.id %}
+    <div class="card shadow-lg p-2 mb-2 rounded">
+        {% if request.user.id != author.id %}
+        <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'users:create_dialog' author.id %}" role="button">Написать сообщение</a>
+        {% else %}
+        <a class="btn btn-lg btn-outline-danger btn-sm" href="{% url 'users:dialogs' %}" role="button">Сообщения</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if view_name == 'index:index' or view_name == 'index:follow_index' or view_name == 'index:create' or view_name == 'index:edit' or view_name == 'index:post_detail' %}
     <div class="alert alert-light shadow-lg p-2 mb-2 rounded" role="alert">
-        <select class="form-select" aria-label="Default select example" onchange="location = this.value;">
+        <select class="form-select" aria-label="Default select" onchange="location = this.value;">
             <option selected>Изменить профиль/пароль</option>
             <option value="{% url 'users:update_profile' %}">Изменить профиль</option>
             <option value="{% url 'users:password_change' %}">Изменить пароль</option>
