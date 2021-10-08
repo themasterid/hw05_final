@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Comment, Follow, Group, Post
+from .models import Comment, Follow, Group, Ip, Post
 
 
 @admin.register(Post)
@@ -58,5 +58,6 @@ class FollowAdmin(admin.ModelAdmin):
     search_fields = ('user', 'author')
 
 
+admin.site.register(Ip)
 admin.site.site_title = 'DJANGO PYBLOG'
 admin.site.site_header = 'DJANGO PYBLOG'

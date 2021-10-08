@@ -10,9 +10,16 @@ from django.views.generic import ListView
 from users.models import Profile
 
 from .forms import CommentForm, EmailPostForm, PostForm
-from .models import Comment, Follow, Group, Post
+from .models import Comment, Follow, Group, Ip, Post
 
 User = get_user_model()
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0]
+    return request.META.get('REMOTE_ADDR')
 
 
 class SearchResultsView(ListView):
@@ -98,6 +105,15 @@ def post_detail(request, post_id):
     form = CommentForm()
     author = get_object_or_404(User, username=post.author)
     following = request.user.is_authenticated
+
+    ip = get_client_ip(request)
+
+    if Ip.objects.filter(ip=ip).exists():
+        post.views.add(Ip.objects.get(ip=ip))
+    else:
+        Ip.objects.create(ip=ip)
+        post.views.add(Ip.objects.get(ip=ip))
+
     if following:
         following = author.following.filter(user=request.user).exists()
     template = 'posts/post_detail.html'
@@ -232,6 +248,20 @@ def profile_unfollow(request, username):
     if profile_follow.exists():
         profile_follow.delete()
     return redirect('posts:profile', username=username)
+
+
+'''
+@login_required
+def profile_unfollow(request, username):
+    user_follower = get_object_or_404(
+        Follow,
+        user=request.user,
+        author__username=username
+    )
+    if user_follower.exists():
+        user_follower.delete()
+    return redirect('posts:profile', username)
+'''
 
 
 @login_required

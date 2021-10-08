@@ -6,6 +6,13 @@ from django.db import models
 User = get_user_model()
 
 
+class Ip(models.Model):
+    ip = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.ip
+
+
 class Group(models.Model):
     title = models.CharField(
         max_length=200,
@@ -70,6 +77,14 @@ class Post(models.Model):
     status = models.BooleanField(
         default=True,
         verbose_name='Опубликован')
+    views = models.ManyToManyField(
+        Ip,
+        related_name="post_views",
+        verbose_name='Просмотры',
+        blank=True)
+
+    def total_views(self):
+        return self.views.count()
 
     class Meta:
         ordering = ['-pub_date']
