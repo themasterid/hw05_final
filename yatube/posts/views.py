@@ -1,135 +1,76 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
-from django.core.mail import send_mail
 from django.core.paginator import Paginator
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView
-from users.models import Profile
+from django.views.decorators.cache import cache_page
 
-from .forms import CommentForm, EmailPostForm, PostForm
-from .models import Comment, Follow, Group, Ip, Post
+from .forms import CommentForm, PostForm
+from .models import Follow, Group, Post
 
 User = get_user_model()
 
 
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        return x_forwarded_for.split(',')[0]
-    return request.META.get('REMOTE_ADDR')
-
-
-class SearchResultsView(ListView):
-    model = Post
-    template_name = 'posts/search_results.html'
-    paginate_by = settings.NUMBER_POST
-
-    def get_queryset(self):
-        query = self.request.GET.get('q')
-        return Post.objects.filter(
-            Q(text__icontains=query) | Q(title__icontains=query))
-
-
-def get_aside():
-    all_posts = Post.objects.all()[:settings.NUMBER_POST]
-    groups = Group.objects.all()[:settings.NUMBER_POST]
-    users = User.objects.all().order_by('id')[:settings.NUMBER_POST]
-    comments = Comment.objects.all().select_related(
-        'post')[:settings.NUMBER_POST]
-    return all_posts, groups, users, comments
-
-
-def get_paginator(request, req):
+@cache_page(20)
+def index(request):
     paginator = Paginator(
-        req,
+        Post.objects.all(),
         settings.NUMBER_POST
     )
     page_number = request.GET.get('page')
-    return paginator.get_page(page_number)
-
-
-def index(request):
-    post = Post.objects.select_related('author', 'group')
-    page_obj = get_paginator(request, post)
-    all_posts, groups, users, comments = get_aside()
+    page_obj = paginator.get_page(page_number)
+    template = 'posts/index.html'
     context = {
         'page_obj': page_obj,
-        'all_posts': all_posts,
-        'groups': groups,
-        'users': users,
-        'comments': comments}
-    return render(request, 'posts/index.html', context)
+    }
+    return render(request, template, context)
 
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.select_related('author').filter(group=group)
-    page_obj = get_paginator(request, posts)
+    paginator = Paginator(
+        group.posts.all(),
+        settings.NUMBER_POST
+    )
+    page_obj = paginator.get_page(
+        request.GET.get('page')
+    )
+    template = 'posts/group_list.html'
     context = {'group': group, 'page_obj': page_obj}
-    return render(
-        request, 'posts/group_list.html', context)
+    return render(request, template, context)
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    posts = author.posts.select_related('author').filter(author=author)
-    page_obj = get_paginator(request, posts)
-    profile = get_object_or_404(
-        Profile.objects.select_related('user'),
-        user=author)
+    paginator = Paginator(
+        author.posts.all(),
+        settings.NUMBER_POST
+    )
+    page_obj = paginator.get_page(
+        request.GET.get('page')
+    )
     following = request.user.is_authenticated
     if following:
         following = author.following.filter(user=request.user).exists()
-    all_posts, groups, users, comments = get_aside()
+    template = 'posts/profile.html'
     context = {
         'page_obj': page_obj,
         'author': author,
-        'following': following,
-        'profile': profile,
-        'all_posts': all_posts,
-        'groups': groups,
-        'users': users,
-        'comments': comments
+        'following': following
     }
-    return render(
-        request, 'posts/profile.html', context)
+    return render(request, template, context)
 
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    profile = get_object_or_404(Profile, user=post.author)
-    comments_details = post.comments.all()
+    comments = post.comments.all()
     form = CommentForm()
-    author = get_object_or_404(User, username=post.author)
-    following = request.user.is_authenticated
-
-    ip = get_client_ip(request)
-
-    if Ip.objects.filter(ip=ip).exists():
-        post.views.add(Ip.objects.get(ip=ip))
-    else:
-        Ip.objects.create(ip=ip)
-        post.views.add(Ip.objects.get(ip=ip))
-
-    if following:
-        following = author.following.filter(user=request.user).exists()
     template = 'posts/post_detail.html'
-    all_posts, groups, users, comments = get_aside()
     context = {
         'post': post,
         'requser': request.user,
-        'author': post.author,
-        'form': form,
-        'profile': profile,
-        'all_posts': all_posts,
-        'groups': groups,
-        'users': users,
         'comments': comments,
-        'comments_details': comments_details,
-        'following': following
+        'form': form,
     }
     return render(request, template, context)
 
@@ -147,18 +88,7 @@ def add_comment(request, post_id):
 
 
 @login_required
-def delete_comment(request, post_id, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    user = Comment.objects.get(pk=comment_id)
-    if request.user != user.author:
-        return redirect('posts:post_detail', post_id)
-    comment.delete()
-    return redirect('posts:post_detail', post_id)
-
-
-@login_required
 def post_create(request):
-    all_posts, groups, users, comments = get_aside()
     form = PostForm(
         request.POST or None,
         files=request.FILES or None)
@@ -166,16 +96,9 @@ def post_create(request):
         create_post = form.save(commit=False)
         create_post.author = request.user
         create_post.save()
-        cache.clear()
         return redirect('posts:profile', create_post.author)
     template = 'posts/create_post.html'
-    context = {
-        'form': form,
-        'comments': comments,
-        'all_posts': all_posts,
-        'users': users,
-        'groups': groups,
-        }
+    context = {'form': form}
     return render(request, template, context)
 
 
@@ -184,51 +107,26 @@ def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.user != post.author:
         return redirect('posts:post_detail', post_id)
-    all_posts, groups, users, comments = get_aside()
     form = PostForm(
         request.POST or None,
         files=request.FILES or None,
         instance=post)
     if form.is_valid():
         form.save()
-        cache.clear()
         return redirect('posts:post_detail', post_id)
     template = 'posts/create_post.html'
-    context = {
-        'form': form,
-        'post': post,
-        'is_edit': True,
-        'comments': comments,
-        'all_posts': all_posts,
-        'users': users,
-        'groups': groups,
-        }
+    context = {'form': form, 'post': post, 'is_edit': True}
     return render(request, template, context)
-
-
-@login_required
-def post_delete(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.user != post.author:
-        return redirect('posts:post_detail', post_id)
-    post.delete()
-    cache.clear()
-    return redirect('posts:profile', post.author)
 
 
 @login_required
 def follow_index(request):
     posts = Post.objects.filter(
         author__following__user=request.user)
-    page_obj = get_paginator(request, posts)
-    all_posts, groups, users, comments = get_aside()
-    context = {
-        'all_posts': all_posts,
-        'users': users,
-        'groups': groups,
-        'page_obj': page_obj,
-        'comments': comments
-    }
+    paginator = Paginator(posts, settings.NUMBER_POST)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'page_obj': page_obj}
     return render(request, 'posts/follow.html', context)
 
 
@@ -242,64 +140,10 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    author = get_object_or_404(User, username=username)
-    profile_follow = Follow.objects.filter(
-        user=request.user, author=author).select_related('user')
-    if profile_follow.exists():
-        profile_follow.delete()
-    return redirect('posts:profile', username=username)
-
-
-'''
-@login_required
-def profile_unfollow(request, username):
     user_follower = get_object_or_404(
         Follow,
         user=request.user,
         author__username=username
     )
-    if user_follower.exists():
-        user_follower.delete()
+    user_follower.delete()
     return redirect('posts:profile', username)
-'''
-
-
-@login_required
-def post_share(request, post_id):
-    post = get_object_or_404(
-        Post,
-        id=post_id,
-        status=True)
-    send = False
-    user_name = f'{request.user.first_name} {request.user.last_name}'
-    user_email = request.user.email
-    if request.method == 'GET':
-        data = {
-            'name': user_name,
-            'email': user_email,
-            'to': user_email}
-        form = EmailPostForm(data)
-        return render(
-            request, 'posts/share.html', {'post': post, 'form': form})
-    form = EmailPostForm(request.POST or None)
-    if form.is_valid():
-        cd = form.cleaned_data
-        if cd['comments'] == '':
-            cd['comments'] = '---пусто---'
-        post_url = f'https://themasterid.pythonanywhere.com/posts/{post_id}/'
-        # post_url = request.build_absolute_uri(post.get_absolute_url())
-        subject = '{} ({}) рекоменду прочитать "{}"'.format(
-            cd['name'], cd['email'], post.title)
-        message = 'Прочти "{}" на {}\n\n{} оставил комментарий: {}'.format(
-            post.title, post_url, cd['name'], cd['comments'])
-        send_mail(subject, message, 'thebrootos@gmail.com', [cd['to']])
-        send = True
-        return render(
-            request,
-            'posts/share.html',
-            {'post': post, 'form': form, 'send': send, 'post_url': post_url})
-    form = EmailPostForm()
-    return render(
-        request,
-        'posts/share.html',
-        {'post': post, 'form': form, 'send': send})

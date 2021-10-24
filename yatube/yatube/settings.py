@@ -1,7 +1,5 @@
 import os
 
-# from .secret_email import EMAILHOST_PASSWORD, EMAILHOST_USER
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 with open('C:/DEV/YP/hw05_final/secret_settings.txt') as f:
@@ -12,22 +10,15 @@ DEBUG = True
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 ALLOWED_HOSTS = [
-    'themasterid.pythonanywhere.com',
-    '*',
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    'testserver',
 ]
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
-'''
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = EMAILHOST_USER
-EMAIL_HOST_PASSWORD = EMAILHOST_PASSWORD
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-'''
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 LOGIN_URL = 'users:login'
 
@@ -44,15 +35,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sorl.thumbnail',
     'users.apps.UsersConfig',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'posts.apps.PostsConfig',
     'about.apps.AboutConfig',
     'core.apps.CoreConfig',
-    'ckeditor',
-    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'yatube.urls'
@@ -82,16 +71,9 @@ TEMPLATES = [
     },
 ]
 
-# CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#    }
-# }
-
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': os.path.join(BASE_DIR, 'yatube_cache/')
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
 
@@ -136,110 +118,9 @@ STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
 
-NUMBER_POST = 5
+NUMBER_POST = 10
 
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-INTERNAL_IPS = ('127.0.0.1', '192.168.0.1',)
-
-CKEDITOR_UPLOAD_PATH = 'uploads/'
-CKEDITOR_IMAGE_BACKEND = 'pillow'
-
-CKEDITOR_CONFIGS = {
-    'default': {
-        # 'skin': 'moono',
-        # 'skin': 'office2013',
-        'toolbar_Basic': [
-            ['Source', '-', 'Bold', 'Italic']
-        ],
-        'toolbar_YourCustomToolbarConfig': [
-            {'name': 'document', 'items': ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']},
-            {'name': 'clipboard', 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
-            {'name': 'editing', 'items': ['Find', 'Replace', '-', 'SelectAll']},
-            # {'name': 'forms',
-            #  'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
-            #            'HiddenField']},
-            # '/',
-            {'name': 'colors', 'items': ['TextColor', 'BGColor']},
-            {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
-            {'name': 'basicstyles',
-             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
-            {'name': 'paragraph',
-             'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
-                       'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl',]},
-            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
-            {'name': 'insert',
-             'items': ['Image', 'Youtube', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
-            {'name': 'tools', 'items': ['Maximize',]},
-        ],
-        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-        'height': 300,
-        'width': '100%',
-        'toolbarCanCollapse': False,
-        'forcePasteAsPlainText': True,
-        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
-        # 'height': 291,
-        # 'width': '100%',
-        # 'filebrowserWindowHeight': 725,
-        # 'filebrowserWindowWidth': 940,
-        # 'toolbarCanCollapse': True,
-        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
-        'tabSpaces': 4,
-        'extraPlugins': ','.join([
-            'uploadimage', # the upload image feature
-            # your extra plugins here
-            'div',
-            'autolink',
-            'youtube',
-            'autoembed',
-            'embedsemantic',
-            'autogrow',
-            'devtools',
-            'widget',
-            'lineutils',
-            'clipboard',
-            'dialog',
-            'dialogui',
-            'elementspath'
-        ]),
-    }
-}
-
-'''
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': [
-            [
-                'Undo', 'Redo',
-                '-', 'Bold', 'Italic', 'Underline',
-                '-', 'Link', 'Unlink', 'Anchor',
-                '-', 'Format',
-                '-', 'Maximize',
-                # '-', 'Table',
-                '-', 'Image',
-                '-', 'Youtube',
-                '-', 'Source',
-                '-', 'NumberedList', 'BulletedList'
-            ],
-            [
-                'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock',
-                '-', 'Font', 'FontSize', 'TextColor',
-                '-', 'Outdent', 'Indent',
-                '-', 'HorizontalRule',
-                '-', 'Blockquote'
-            ]
-        ],
-        'height': 300,
-        'width': '100%',
-        'toolbarCanCollapse': False,
-        'forcePasteAsPlainText': True
-    }
-}
-'''
-
-CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
-CKEDITOR_RESTRICT_BY_USER = True
-CKEDITOR_BROWSE_SHOW_DIRS = True
-AWS_QUERYSTRING_AUTH = False
+# INTERNAL_IPS = ('127.0.0.1', '192.168.0.1',)

@@ -1,18 +1,7 @@
-from ckeditor.fields import RichTextField
-from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 
 User = get_user_model()
-
-
-class Ip(models.Model):
-    ip = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.ip
 
 
 class Group(models.Model):
@@ -39,17 +28,10 @@ class Group(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField(
-        max_length=200,
-        verbose_name='Заголовок',
-        help_text='Заголовок нового поста'
-    )
-    text = RichTextUploadingField(
-        blank=True,
-        null=True,
-        max_length=12000,
+    text = models.TextField(
+        max_length=400,
         verbose_name='Текст поста',
-        help_text='<br>Текст нового поста'
+        help_text='Текст нового поста'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -73,20 +55,8 @@ class Post(models.Model):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True,
-        help_text='Картинка в шапку поста'
+        blank=True
     )
-    status = models.BooleanField(
-        default=True,
-        verbose_name='Опубликован')
-    views = models.ManyToManyField(
-        Ip,
-        related_name="post_views",
-        verbose_name='Просмотры',
-        blank=True)
-
-    def total_views(self):
-        return self.views.count()
 
     class Meta:
         ordering = ['-pub_date']
@@ -94,7 +64,7 @@ class Post(models.Model):
         verbose_name = 'Пост'
 
     def __str__(self):
-        return self.title[:15]
+        return self.text[:15]
 
 
 class Comment(models.Model):
@@ -108,9 +78,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор')
-    text = RichTextField(
-        blank=True,
-        null=True,
+    text = models.TextField(
         verbose_name='Коментарий')
     created = models.DateTimeField(
         auto_now_add=True,
@@ -128,7 +96,7 @@ class Comment(models.Model):
         verbose_name = 'Коментарий'
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Follow(models.Model):
