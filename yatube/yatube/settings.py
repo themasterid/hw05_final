@@ -1,20 +1,21 @@
 import os
 
+import environ
+
+env = environ.Env()
+
+environ.Env.read_env()
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-with open('C:/DEV/YP/hw05_final/secret_settings.txt') as f:
-    SECRET_KEY = f.read().strip()
+SECRET_KEY = env(
+    'SECRET_KEY',
+    default="unsafe-secret-key-45t548fh48fh4gefgh4734753erhg#$@#$")
 
-DEBUG = True
+DEBUG = env('DEBUG', default='True') == 'True'
 
-CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
-
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-    'testserver',
-]
+ALLOWED_HOSTS = env(
+    'ALLOWED_HOSTS', default='localhost').split(', ')
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
@@ -33,8 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'sorl.thumbnail',
     'users.apps.UsersConfig',
+    'sorl.thumbnail',
     # 'debug_toolbar',
     'posts.apps.PostsConfig',
     'about.apps.AboutConfig',
@@ -101,9 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -113,14 +114,20 @@ USE_TZ = True
 
 DATE_FORMAT = 'd E Y'
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
+MEDIA_URL = 'media/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 
 NUMBER_POST = 10
 
-MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # INTERNAL_IPS = ('127.0.0.1', '192.168.0.1',)
