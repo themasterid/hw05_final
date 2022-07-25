@@ -6,19 +6,23 @@
 
 Покрытие тестами проекта Yatube из спринта 6 Питон-разработчика бекенда Яндекс.Практикум. Все что нужно, это покрыть тестами проект, в учебных целях. Реализована система подписок/отписок на авторов постов.
 
+* ЗАМЕЧАНИЕ:
+* Не работает статика должным образом, пофиксить, переходом на Django 3 или 4
+
 Стек:
 
-Django==2.2.28
-mixer==7.1.2
-Pillow==9.0.1
-pytest==6.2.4
-pytest-django==4.4.0
-pytest-pythonpath==0.7.3
-requests==2.26.0
-six==1.16.0
-sorl-thumbnail==12.7.0
-Pillow==9.0.1
-django-environ==0.8.1
+- Python 3.10.5
+- Django==2.2.28
+- mixer==7.1.2
+- Pillow==9.0.1
+- pytest==6.2.4
+- pytest-django==4.4.0
+- pytest-pythonpath==0.7.3
+- requests==2.26.0
+- six==1.16.0
+- sorl-thumbnail==12.7.0
+- Pillow==9.0.1
+- django-environ==0.8.1
 
 ### Настройка и запуск на ПК
 
@@ -161,13 +165,7 @@ tests/test_homework.py::TestPost::test_post_model PASSED                        
 tests/test_homework.py::TestPost::test_post_admin PASSED                                                             [ 96%] 
 tests/test_homework.py::TestGroup::test_group_model PASSED                                                           [100%] 
 
-==================================================== warnings summary ===================================================== 
-venv\lib\site-packages\django\utils\version.py:6
-  ...\hw05_final\venv\lib\site-packages\django\utils\version.py:6: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
-    from distutils.version import LooseVersion
-
--- Docs: https://docs.pytest.org/en/stable/warnings.html
-============================================== 31 passed, 1 warning in 5.86s ==============================================
+============================================== 31 passed in 5.86s ==============================================
 ```
 
 Запускаем проект:
