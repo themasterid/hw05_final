@@ -1,6 +1,6 @@
 Django>=4.2.29
 mixer==7.1.2
-Pillow==12.1.1
+Pillow==12.2.0
 pytest==9.0.3
 pytest-django==4.4.0
 pytest-pythonpath==0.7.3
